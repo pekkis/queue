@@ -17,11 +17,11 @@ Got ideas / wishes? Contact or create a pull request! Cheers!
 Supported queues
 -----------------
 
-RabbitMQ (via PECL and pure PHP).
+- RabbitMQ (via PECL and pure PHP).
 
 Upcoming support
 -----------------
 
-IronMQ
-Amazon SQS
+- IronMQ
+- Amazon SQS
 
