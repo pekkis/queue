@@ -33,7 +33,7 @@ class Processor
     /**
      * @var MessageHandler[]
      */
-    protected $handlers = [];
+    protected $handlers = array();
 
     public function __construct(Queue $queue, OutputInterface $output = null)
     {
