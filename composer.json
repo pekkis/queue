@@ -1,0 +1,33 @@
+{
+    "name": "pekkis/queue",
+    "type": "library",
+    "description": "Queue abstraction library",
+    "keywords": ["queue", "message queue"],
+    "homepage": "http://github.com/pekkis/queue",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Mikko Forsström",
+            "email": "pekkisx@gmail.com",
+            "homepage": "http://diktaattoriporssi.com",
+            "role": "Developer"
+        }
+    ],
+
+    "require": {
+        "php": ">=5.3.10",
+        "symfony/console": ">=2.2.0",
+        "rhumsaa/uuid": "2.3.*"
+    },
+
+    "require-dev": {
+        "videlalvaro/php-amqplib": ">=dev-master@dev"
+    },
+
+    "autoload": {
+        "psr-0": {
+            "Pekkis\\Queue": "library/"
+        }
+    },
+    "minimum-stability": "stable"
+}

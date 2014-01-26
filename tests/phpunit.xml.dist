@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<phpunit bootstrap="bootstrap.php" colors="true">
+    <testsuites>
+        <testsuite name="pekkis-queue-tests">
+            <directory>./Pekkis/Queue</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <const name="RABBITMQ_HOST" value="localhost" />
+        <const name="RABBITMQ_PORT" value="5672" />
+        <const name="RABBITMQ_VHOST" value="/" />
+        <const name="RABBITMQ_USERNAME" value="guest" />
+        <const name="RABBITMQ_PASSWORD" value="guest" />
+    </php>
+</phpunit>
