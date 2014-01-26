@@ -22,4 +22,4 @@ before_script:
   - sh -c "cd amqp-1.2.0 && phpize && ./configure && make && sudo make install"
   - echo "extension=amqp.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
 
-script: cd tests && phpunit -v --configuration tests/phpunit.xml.travis
+script: cd tests && phpunit -v --configuration phpunit.xml.travis
