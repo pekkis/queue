@@ -9,12 +9,10 @@
 
 namespace Pekkis\Queue;
 
-
-
-interface Enqueueable
+class Events
 {
-    /**
-     * @return Message
-     */
-    public function getMessage();
+    const ENQUEUE = 'pekkis_queue.enqueue';
+    const DEQUEUE = 'pekkis_queue.dequeue';
+    const ACK = 'pekkis_queue.ack';
+    const PURGE = 'pekkis_queue.purge';
 }

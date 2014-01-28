@@ -14,17 +14,22 @@ class ProcessorTest extends \Pekkis\Queue\Tests\TestCase
     protected $queue;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $ed;
+
+    /**
      * @var Processor
      */
     protected $processor;
+
 
     public function setUp()
     {
         $queue = $this->getMockBuilder('Pekkis\Queue\Queue')->disableOriginalConstructor()->getMock();
         $this->queue = $queue;
-
-        $this->processor = new Processor($this->queue);
-
+        $this->ed = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->processor = new Processor($this->queue, $this->ed);
     }
 
     /**

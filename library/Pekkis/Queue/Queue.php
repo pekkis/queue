@@ -1,17 +1,37 @@
 <?php
 
+/**
+ * This file is part of the pekkis-queue package.
+ *
+ * For copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Pekkis\Queue;
 
 use Pekkis\Queue\Adapter\Adapter;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Queue
 {
     /**
-     * @param Adapter $adapter
+     * @var Adapter
      */
-    public function __construct(Adapter $adapter)
+    private $adapter;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
+     * @param Adapter $adapter
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function __construct(Adapter $adapter, EventDispatcherInterface $eventDispatcher)
     {
         $this->adapter = $adapter;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -22,8 +42,8 @@ class Queue
     public function enqueue(Enqueueable $enqueueable)
     {
         $message = $enqueueable->getMessage();
-
-        return $this->adapter->enqueue($enqueueable);
+        $this->eventDispatcher->dispatch(Events::ENQUEUE, new MessageEvent($message));
+        return $this->adapter->enqueue($message);
     }
 
     /**
@@ -33,7 +53,10 @@ class Queue
      */
     public function dequeue()
     {
-        return $this->adapter->dequeue();
+        $message = $this->adapter->dequeue();
+        $this->eventDispatcher->dispatch(Events::DEQUEUE, new MessageEvent($message));
+
+        return $message;
     }
 
     /**
@@ -41,6 +64,7 @@ class Queue
      */
     public function purge()
     {
+        $this->eventDispatcher->dispatch(Events::PURGE);
         return $this->adapter->purge();
     }
 
@@ -51,6 +75,7 @@ class Queue
      */
     public function ack(Message $message)
     {
+        $this->eventDispatcher->dispatch(Events::ACK, new MessageEvent($message));
         return $this->adapter->ack($message);
     }
 }

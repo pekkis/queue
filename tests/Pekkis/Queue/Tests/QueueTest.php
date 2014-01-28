@@ -12,10 +12,13 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
 
     private $queue;
 
+    private $ed;
+
     public function setUp()
     {
         $this->adapter = $this->getMock('Pekkis\Queue\Adapter\Adapter');
-        $this->queue = new Queue($this->adapter);
+        $this->ed = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->queue = new Queue($this->adapter, $this->ed);
     }
 
     /**

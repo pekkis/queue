@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the Xi Filelib package.
+ * This file is part of the pekkis-queue package.
  *
  * For copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -9,10 +9,12 @@
 
 namespace Pekkis\Queue\Processor;
 
+use Pekkis\Queue\MessageEvent;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Pekkis\Queue\Queue;
 use Pekkis\Queue\Message;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Default implementation of a queue processor
@@ -26,19 +28,19 @@ class Processor
     protected $queue;
 
     /**
-     * @var OutputInterface
+     * @var EventDispatcherInterface
      */
-    protected $output;
+    protected $eventDispatcher;
 
     /**
      * @var MessageHandler[]
      */
     protected $handlers = array();
 
-    public function __construct(Queue $queue, OutputInterface $output = null)
+    public function __construct(Queue $queue, EventDispatcherInterface $eventDispatcher)
     {
         $this->queue = $queue;
-        $this->output = $output ?: new NullOutput();
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function getQueue()
@@ -61,16 +63,16 @@ class Processor
         $message = $this->queue->dequeue();
 
         if (!$message) {
-            $this->output->writeln("Nothing to process");
+            $this->eventDispatcher->dispatch(Events::NOTHING_TO_PROCESS);
             return false;
         }
 
-        $this->output->writeln(
-            sprintf("Received a message of type '%s'", $message->getType())
-        );
+        $this->eventDispatcher->dispatch(Events::MESSAGE_RECEIVE, new MessageEvent($message));
 
         $result = $this->handleMessage($message);
         if (!$result) {
+
+            $this->eventDispatcher->dispatch(Events::MESSAGE_NOT_HANDLABLE, new MessageEvent($message));
             throw new \RuntimeException(sprintf("No handler will handle a message of type '%s'", $message->getType()));
         }
 
@@ -84,11 +86,24 @@ class Processor
         return true;
     }
 
+    /**
+     * @param Message $message
+     * @return Result
+     */
     private function handleMessage(Message $message)
     {
         foreach ($this->handlers as $handler) {
             if ($handler->willHandle($message)) {
-                return $handler->handle($message);
+                $this->eventDispatcher->dispatch(Events::MESSAGE_BEFORE_HANDLE, new MessageEvent($message));
+
+                $ret = $handler->handle($message);
+
+                $this->eventDispatcher->dispatch(
+                    Events::MESSAGE_AFTER_HANDLE,
+                    new ResultEvent($ret, $message)
+                );
+
+                return $ret;
             }
         }
         return false;
