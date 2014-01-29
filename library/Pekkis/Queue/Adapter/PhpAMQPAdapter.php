@@ -12,7 +12,6 @@ namespace Pekkis\Queue\Adapter;
 use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Channel\AMQPChannel;
-use Pekkis\Queue\Enqueueable;
 use Pekkis\Queue\Message;
 
 class PhpAMQPAdapter implements Adapter
@@ -72,10 +71,8 @@ class PhpAMQPAdapter implements Adapter
         return $this->channel;
     }
 
-    public function enqueue(Enqueueable $enqueueable)
+    public function enqueue(Message $msg)
     {
-        $msg = $enqueueable->getMessage();
-
         $msg = new AMQPMessage(
             json_encode($msg->toArray()),
             array('content_type' => 'application/json', 'delivery-mode' => 1)

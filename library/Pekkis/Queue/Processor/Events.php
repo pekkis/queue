@@ -11,7 +11,7 @@ namespace Pekkis\Queue\Processor;
 
 class Events
 {
-    const NOTHING_TO_PROCESS = 'pekkis_queue.processor.nothing_to_process';
+    const QUEUE_EMPTY = 'pekkis_queue.processor.queue_empty';
     const MESSAGE_RECEIVE = 'pekkis_queue.processor.message.receive';
     const MESSAGE_NOT_HANDLABLE = 'pekkis_queue.processor.message.not_handlable';
     const MESSAGE_BEFORE_HANDLE = 'pekkis_queue.processor.message.before_handle';

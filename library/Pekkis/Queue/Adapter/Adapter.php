@@ -9,20 +9,19 @@
 
 namespace Pekkis\Queue\Adapter;
 
-use Pekkis\Queue\Enqueueable;
 use Pekkis\Queue\Message;
 
 interface Adapter
 {
     /**
-     * Enqueues message
+     * Enqueues a message
      *
-     * @param Enqueueable $enqueueable
+     * @param Message $message
      */
-    public function enqueue(Enqueueable $enqueueable);
+    public function enqueue(Message $message);
 
     /**
-     * Dequeues message
+     * Dequeues a message
      *
      * @return Message
      */
@@ -34,7 +33,7 @@ interface Adapter
     public function purge();
 
     /**
-     * Acknowledges message
+     * Acknowledges a message
      *
      * @param Message $message
      */

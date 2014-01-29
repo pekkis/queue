@@ -13,7 +13,6 @@ use AMQPConnection;
 use AMQPChannel;
 use AMQPExchange;
 use AMQPQueue;
-use Pekkis\Queue\Enqueueable;
 use Pekkis\Queue\Message;
 
 class PeclAMQPAdapter implements Adapter
@@ -65,12 +64,9 @@ class PeclAMQPAdapter implements Adapter
 
     }
 
-    public function enqueue(Enqueueable $enqueueable)
+    public function enqueue(Message $msg)
     {
-        $msg = $enqueueable->getMessage();
-
         $msg = json_encode($msg->toArray());
-
         $this->exchange->publish($msg, 'xi_filelib');
     }
 

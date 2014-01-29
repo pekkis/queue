@@ -63,7 +63,7 @@ class Processor
         $message = $this->queue->dequeue();
 
         if (!$message) {
-            $this->eventDispatcher->dispatch(Events::NOTHING_TO_PROCESS);
+            $this->eventDispatcher->dispatch(Events::QUEUE_EMPTY);
             return false;
         }
 
