@@ -66,7 +66,7 @@ class ConsoleOutputSubscriber implements EventSubscriberInterface
 
         $this->output->writeln(
             sprintf(
-                "Message '%' of type '%s' was handled: %s. Result message: '%s",
+                "Message '%' of type '%s' was handled: %s. Result message: '%s'",
                 $message->getUuid(),
                 $message->getType(),
                 $successStr,
