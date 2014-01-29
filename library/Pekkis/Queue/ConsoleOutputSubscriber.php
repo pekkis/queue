@@ -35,7 +35,7 @@ class ConsoleOutputSubscriber implements EventSubscriberInterface
     {
         $message = $event->getMessage();
         $this->output->writeln(
-            sprintf("Message '%' of type '%s' enqueued", $message->getUuid(), $message->getType())
+            sprintf("Message '%s' of type '%s' enqueued", $message->getUuid(), $message->getType())
         );
     }
 
@@ -43,7 +43,7 @@ class ConsoleOutputSubscriber implements EventSubscriberInterface
     {
         $message = $event->getMessage();
         $this->output->writeln(
-            sprintf("Message '%' of type '%s' dequeued", $message->getUuid(), $message->getType())
+            sprintf("Message '%s' of type '%s' dequeued", $message->getUuid(), $message->getType())
         );
     }
 
@@ -51,7 +51,7 @@ class ConsoleOutputSubscriber implements EventSubscriberInterface
     {
         $message = $event->getMessage();
         $this->output->writeln(
-            sprintf("Message '%' of type '%s' acked", $message->getUuid(), $message->getType())
+            sprintf("Message '%s' of type '%s' acked", $message->getUuid(), $message->getType())
         );
     }
 

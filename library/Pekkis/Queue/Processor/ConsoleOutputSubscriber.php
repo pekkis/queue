@@ -37,7 +37,7 @@ class ConsoleOutputSubscriber implements EventSubscriberInterface
     {
         $message = $event->getMessage();
         $this->output->writeln(
-            sprintf("Message '%' of type '%s' received by processor", $message->getUuid(), $message->getType())
+            sprintf("Message '%s' of type '%s' received by processor", $message->getUuid(), $message->getType())
         );
     }
 
@@ -45,7 +45,7 @@ class ConsoleOutputSubscriber implements EventSubscriberInterface
     {
         $message = $event->getMessage();
         $this->output->writeln(
-            sprintf("Message '%' of type '%s' is not handlable", $message->getUuid(), $message->getType())
+            sprintf("Message '%s' of type '%s' is not handlable", $message->getUuid(), $message->getType())
         );
     }
 
@@ -53,7 +53,7 @@ class ConsoleOutputSubscriber implements EventSubscriberInterface
     {
         $message = $event->getMessage();
         $this->output->writeln(
-            sprintf("Message '%' of type '%s' will be handled", $message->getUuid(), $message->getType())
+            sprintf("Message '%s' of type '%s' will be handled", $message->getUuid(), $message->getType())
         );
     }
 
@@ -66,7 +66,7 @@ class ConsoleOutputSubscriber implements EventSubscriberInterface
 
         $this->output->writeln(
             sprintf(
-                "Message '%' of type '%s' was handled: %s. Result message: '%s'",
+                "Message '%s' of type '%s' was handled: %s. Result message: '%s'",
                 $message->getUuid(),
                 $message->getType(),
                 $successStr,
