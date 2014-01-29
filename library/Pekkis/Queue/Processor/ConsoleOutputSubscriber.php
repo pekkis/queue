@@ -7,7 +7,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Pekkis\Queue\MessageEvent;
 
-class ConsoleOutputSubscriper implements EventSubscriberInterface
+class ConsoleOutputSubscriber implements EventSubscriberInterface
 {
     /**
      * @var ConsoleOutputInterface
