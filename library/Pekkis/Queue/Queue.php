@@ -54,8 +54,9 @@ class Queue
     public function dequeue()
     {
         $message = $this->adapter->dequeue();
-        $this->eventDispatcher->dispatch(Events::DEQUEUE, new MessageEvent($message));
-
+        if ($message) {
+            $this->eventDispatcher->dispatch(Events::DEQUEUE, new MessageEvent($message));
+        }
         return $message;
     }
 
