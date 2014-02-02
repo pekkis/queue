@@ -10,6 +10,9 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
 
     private $adapter;
 
+    /**
+     * @var Queue
+     */
     private $queue;
 
     private $ed;
@@ -64,5 +67,27 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
         $this->adapter->expects($this->once())->method('purge')->will($this->returnValue(true));
         $this->assertTrue($this->queue->purge());
     }
+
+    /**
+     * @test
+     */
+    public function getterReturnsEventDispatcher()
+    {
+        $this->assertSame($this->ed, $this->queue->getEventDispatcher());
+    }
+
+    /**
+     * @test
+     */
+    public function addSubscriberDelegatesToEventDispatcher()
+    {
+        $subscriber = $this->getMock('Symfony\Component\EventDispatcher\EventSubscriberInterface');
+        $this->ed->expects($this->once())->method('addSubscriber')->with($subscriber);
+
+        $ret = $this->queue->addSubscriber($subscriber);
+        $this->assertSame($this->queue, $ret);
+
+    }
+
 
 }

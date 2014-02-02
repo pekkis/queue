@@ -11,6 +11,7 @@ namespace Pekkis\Queue;
 
 use Pekkis\Queue\Adapter\Adapter;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class Queue
 {
@@ -78,5 +79,23 @@ class Queue
     {
         $this->eventDispatcher->dispatch(Events::ACK, new MessageEvent($message));
         return $this->adapter->ack($message);
+    }
+
+    /**
+     * @return EventDispatcherInterface
+     */
+    public function getEventDispatcher()
+    {
+        return $this->eventDispatcher;
+    }
+
+    /**
+     * @param EventSubscriberInterface $subscriber
+     * @return Queue
+     */
+    public function addSubscriber(EventSubscriberInterface $subscriber)
+    {
+        $this->eventDispatcher->addSubscriber($subscriber);
+        return $this;
     }
 }
