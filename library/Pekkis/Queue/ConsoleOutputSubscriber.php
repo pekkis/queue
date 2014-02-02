@@ -42,6 +42,7 @@ class ConsoleOutputSubscriber implements EventSubscriberInterface
     public function onDequeue(MessageEvent $event)
     {
         $message = $event->getMessage();
+
         $this->output->writeln(
             sprintf("Message '%s' of type '%s' dequeued", $message->getUuid(), $message->getType())
         );
