@@ -17,7 +17,7 @@ use Pekkis\Queue\Message;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Default implementation of a queue processor
+ * Processes messages from queue
  */
 class Processor
 {
@@ -37,10 +37,10 @@ class Processor
      */
     protected $handlers = array();
 
-    public function __construct(Queue $queue, EventDispatcherInterface $eventDispatcher)
+    public function __construct(Queue $queue)
     {
         $this->queue = $queue;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->eventDispatcher = $queue->getEventDispatcher();
     }
 
     public function getQueue()

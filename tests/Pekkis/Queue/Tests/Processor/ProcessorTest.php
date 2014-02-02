@@ -26,10 +26,12 @@ class ProcessorTest extends \Pekkis\Queue\Tests\TestCase
 
     public function setUp()
     {
+        $this->ed = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $queue = $this->getMockBuilder('Pekkis\Queue\Queue')->disableOriginalConstructor()->getMock();
         $this->queue = $queue;
-        $this->ed = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->processor = new Processor($this->queue, $this->ed);
+        $this->queue->expects($this->any())->method('getEventDispatcher')->will($this->returnValue($this->ed));
+
+        $this->processor = new Processor($this->queue);
     }
 
     /**
