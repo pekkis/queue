@@ -22,7 +22,16 @@
     },
 
     "require-dev": {
-        "videlalvaro/php-amqplib": ">=dev-master@dev"
+        "videlalvaro/php-amqplib": ">=dev-master@dev",
+        "iron-io/iron_mq": "1.4.*",
+        "aws/aws-sdk-php": "2.*"
+    },
+
+    "suggest": {
+        "ext-amqp": "AMQP extension for RabbitMQ support",
+        "videlalvaro/php-amqplib": "Pure PHP library for RabbitMQ support",
+        "iron-io/iron_mq": "For IronMQ support",
+        "aws/aws-sdk-php": "For Amazon SQS support"
     },
 
     "autoload": {
