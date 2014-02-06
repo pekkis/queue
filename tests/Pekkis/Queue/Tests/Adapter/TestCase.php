@@ -27,6 +27,11 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
 
     abstract protected function getAdapter();
 
+    protected function getSleepyTime()
+    {
+        return 1;
+    }
+
     /**
      * @test
      * @return Queue
@@ -92,6 +97,10 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
 
         unset($queue);
         gc_collect_cycles();
+
+        if ($sleepyTime = $this->getSleepyTime()) {
+            sleep($sleepyTime);
+        }
 
         $queue = $this->getAdapter();
 

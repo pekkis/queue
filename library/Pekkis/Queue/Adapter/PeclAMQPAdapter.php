@@ -55,7 +55,7 @@ class PeclAMQPAdapter implements Adapter
         $queue->setName($queueName);
         $queue->setFlags(AMQP_DURABLE);
         $queue->declareQueue();
-        $queue->bind($exchangeName, 'xi_filelib');
+        $queue->bind($exchangeName, '');
 
         $this->conn = $conn;
         $this->exchange = $exchange;
@@ -67,7 +67,7 @@ class PeclAMQPAdapter implements Adapter
     public function enqueue(Message $msg)
     {
         $msg = json_encode($msg->toArray());
-        $this->exchange->publish($msg, 'xi_filelib');
+        $this->exchange->publish($msg, '');
     }
 
     public function dequeue()
