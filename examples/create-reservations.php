@@ -23,7 +23,5 @@ for ($x = 1; $x <= 100; $x = $x + 1) {
         DateTime::createFromFormat('U', $to)
     );
 
-
     $queue->enqueue($reservation);
-
 }

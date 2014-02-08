@@ -3,6 +3,8 @@
 namespace Pekkis\Queue\Tests\Adapter;
 
 use Pekkis\Queue\Adapter\Adapter;
+use Pekkis\Queue\Data\ArrayDataSerializer;
+use Pekkis\Queue\Data\SerializedData;
 use Pekkis\Queue\Message;
 
 abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
@@ -18,9 +20,18 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
      */
     protected $message;
 
+    /**
+     * @var ArrayDataSerializer
+     */
+    protected $serializer;
+
     public function setUp()
     {
-        $this->message = Message::create('test-message', array('aybabtu' => 'lussentus'));
+        $this->serializer = new ArrayDataSerializer();
+
+        $this->message = $this->createMessage('test-message', array('aybabtu' => 'lussentus'));
+
+
         $this->adapter = $this->getAdapter();
         $this->adapter->purge();
     }
@@ -31,6 +42,16 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
     {
         return 1;
     }
+
+    protected function createMessage($type, array $data)
+    {
+        $message = Message::create(
+            'test-message',
+            new SerializedData($this->serializer->getIdentifier(), $this->serializer->serialize($data))
+        );
+        return $message;
+    }
+
 
     /**
      * @test
@@ -44,7 +65,7 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
         $this->assertInstanceOf('Pekkis\Queue\Message', $message);
         $this->adapter->ack($message);
 
-        $this->assertEquals($this->message->getData(), $message->getData());
+        $this->assertInternalType('string', $message->getData());
         $this->assertEquals($this->message->getUuid(), $message->getUuid());
         $this->assertEquals($this->message->getType(), $message->getType());
 
@@ -66,7 +87,7 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
     public function purgeShouldResultInAnEmptyQueue()
     {
         for ($x = 10; $x <= 10; $x++) {
-            $this->adapter->enqueue(Message::create('testosteron', array('count' => $x)));
+            $this->adapter->enqueue($this->createMessage('testosteron', array('count' => $x)));
         }
 
         $msg = $this->adapter->dequeue();
@@ -89,7 +110,7 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
 
         $this->assertNull($queue->dequeue());
 
-        $message = Message::create('testosteron', array('mucho' => 'masculino'));
+        $message = $this->createMessage('testosteron', array('mucho' => 'masculino'));
         $queue->enqueue($message);
 
         $this->assertInstanceOf('Pekkis\Queue\Message', $queue->dequeue());

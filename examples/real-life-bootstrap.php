@@ -2,7 +2,7 @@
 
 namespace Pekkis\Queue\Example;
 
-require_once __DIR__ . '/bootstrap.php';
+require_once (is_file(__DIR__ . '/bootstrap.php')) ? __DIR__ . '/bootstrap.php' : __DIR__ . '/bootstrap.dist.php';
 
 use Pekkis\Queue\Adapter\IronMQAdapter;
 use Pekkis\Queue\Enqueueable;

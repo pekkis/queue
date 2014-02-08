@@ -54,7 +54,7 @@ $queue->ack($received);
 A better example
 -----------------
 
-For an end-to-end example with IronMQ and a "real life" scenario, see the folder `example`.
+For an end-to-end example with IronMQ and a "real life" scenario, see the folder `examples`.
 
 Also see Xi Filelib (v0.10+) for actual real use case from the real world!
 

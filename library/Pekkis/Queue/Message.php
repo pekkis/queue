@@ -21,7 +21,7 @@ class Message implements Enqueueable
 
     private $internal = array();
 
-    private function __construct($uuid, $type, $data = array())
+    private function __construct($uuid, $type, $data)
     {
         $this->uuid = $uuid;
         $this->type = $type;
@@ -31,6 +31,11 @@ class Message implements Enqueueable
     public function getData()
     {
         return $this->data;
+    }
+
+    public function setData($data)
+    {
+        $this->data = $data;
     }
 
     public function getType()
@@ -82,7 +87,7 @@ class Message implements Enqueueable
         return array(
             'uuid' => $this->uuid,
             'type' => $this->type,
-            'data' => $this->data
+            'data' => $this->data->toJson()
         );
     }
 

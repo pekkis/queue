@@ -10,6 +10,10 @@
 namespace Pekkis\Queue;
 
 use Pekkis\Queue\Adapter\Adapter;
+use Pekkis\Queue\Data\ArrayDataSerializer;
+use Pekkis\Queue\Data\DataSerializer;
+use Pekkis\Queue\Data\DataSerializers;
+use Pekkis\Queue\Data\SerializedData;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -26,6 +30,16 @@ class Queue
     private $eventDispatcher;
 
     /**
+     * @var ReflectionProperty
+     */
+    private $messageDataAccessor;
+
+    /**
+     * @var DataSerializers
+     */
+    private $dataSerializers;
+
+    /**
      * @param Adapter $adapter
      * @param EventDispatcherInterface $eventDispatcher
      */
@@ -33,6 +47,9 @@ class Queue
     {
         $this->adapter = $adapter;
         $this->eventDispatcher = $eventDispatcher;
+        $this->dataSerializers = new DataSerializers();
+
+        $this->addDataSerializer(new ArrayDataSerializer());
     }
 
     /**
@@ -43,6 +60,17 @@ class Queue
     public function enqueue(Enqueueable $enqueueable)
     {
         $message = $enqueueable->getMessage();
+
+        $data = $message->getData();
+        $serializer = $this->dataSerializers->getSerializerFor($data);
+        if (!$serializer) {
+            throw new \RuntimeException("Serializer not found");
+        }
+
+        $message->setData(
+            new SerializedData($serializer->getIdentifier(), $serializer->serialize($data))
+        );
+
         $this->eventDispatcher->dispatch(Events::ENQUEUE, new MessageEvent($message));
         return $this->adapter->enqueue($message);
     }
@@ -55,9 +83,22 @@ class Queue
     public function dequeue()
     {
         $message = $this->adapter->dequeue();
-        if ($message) {
-            $this->eventDispatcher->dispatch(Events::DEQUEUE, new MessageEvent($message));
+
+        if (!$message) {
+            return false;
         }
+
+        $json = $message->getData();
+        $serialized = SerializedData::fromJson($json);
+        $serializer = $this->dataSerializers->getUnserializerFor($serialized);
+
+        if (!$serializer) {
+            throw new \RuntimeException('Unserializer not found');
+        }
+
+        $message->setData($serializer->unserialize($serialized->getData()));
+        $this->eventDispatcher->dispatch(Events::DEQUEUE, new MessageEvent($message));
+
         return $message;
     }
 
@@ -97,5 +138,10 @@ class Queue
     {
         $this->eventDispatcher->addSubscriber($subscriber);
         return $this;
+    }
+
+    public function addDataSerializer(DataSerializer $dataSerializer)
+    {
+        $this->dataSerializers->add($dataSerializer);
     }
 }
