@@ -15,6 +15,7 @@ class ResultTest extends \Pekkis\Queue\Tests\TestCase
         $msg = 'All your base are belong to us';
         $result = new Result(false, $msg);
         $this->assertSame($msg, $result->getResultMessage());
+        $this->assertFalse($result->isSuccess());
     }
 }
 

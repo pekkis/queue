@@ -18,10 +18,10 @@ for ($x = 1; $x <= 100; $x = $x + 1) {
     $from = rand($now, $now + 10000);
     $to = rand($now + 10001, $now + 20000);
 
-    $reservation = new ReservationRequest(
+    $reservationRequest = new ReservationRequest(
         DateTime::createFromFormat('U', $from),
         DateTime::createFromFormat('U', $to)
     );
 
-    $queue->enqueue($reservation);
+    $queue->enqueue($reservationRequest);
 }

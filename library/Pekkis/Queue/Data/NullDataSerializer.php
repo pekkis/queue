@@ -9,11 +9,11 @@
 
 namespace Pekkis\Queue\Data;
 
-class ArrayDataSerializer extends AbstractDataSerializer implements DataSerializer
+class NullDataSerializer extends AbstractDataSerializer implements DataSerializer
 {
     public function willSerialize($unserialized)
     {
-        if (is_array($unserialized)) {
+        if (is_null($unserialized)) {
             return true;
         }
 
@@ -22,12 +22,12 @@ class ArrayDataSerializer extends AbstractDataSerializer implements DataSerializ
 
     public function serialize($unserialized)
     {
-        return json_encode($unserialized);
+        return json_encode(null);
     }
 
     public function unserialize($serialized)
     {
-        return json_decode($serialized, true);
+        return null;
     }
 
 }

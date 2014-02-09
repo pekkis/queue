@@ -13,9 +13,15 @@ use Pekkis\Queue\Adapter\Adapter;
 use Pekkis\Queue\Data\ArrayDataSerializer;
 use Pekkis\Queue\Data\DataSerializer;
 use Pekkis\Queue\Data\DataSerializers;
+use Pekkis\Queue\Data\NullDataSerializer;
 use Pekkis\Queue\Data\SerializedData;
+use Pekkis\Queue\Data\StdClassDataSerializer;
+use Pekkis\Queue\Data\StringDataSerializer;
+use Pekkis\Queue\Filter\InputFilters;
+use Pekkis\Queue\Filter\OutputFilters;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Closure;
 
 class Queue
 {
@@ -30,14 +36,13 @@ class Queue
     private $eventDispatcher;
 
     /**
-     * @var ReflectionProperty
-     */
-    private $messageDataAccessor;
-
-    /**
      * @var DataSerializers
      */
     private $dataSerializers;
+
+    private $outputFilters;
+
+    private $inputFilters;
 
     /**
      * @param Adapter $adapter
@@ -49,7 +54,14 @@ class Queue
         $this->eventDispatcher = $eventDispatcher;
         $this->dataSerializers = new DataSerializers();
 
-        $this->addDataSerializer(new ArrayDataSerializer());
+        $this->outputFilters = new OutputFilters();
+        $this->inputFilters = new InputFilters();
+
+        $this
+            ->addDataSerializer(new StdClassDataSerializer())
+            ->addDataSerializer(new ArrayDataSerializer())
+            ->addDataSerializer(new StringDataSerializer())
+            ->addDataSerializer(new NullDataSerializer());
     }
 
     /**
@@ -66,13 +78,18 @@ class Queue
         if (!$serializer) {
             throw new \RuntimeException("Serializer not found");
         }
+        $serializedData = new SerializedData($serializer->getIdentifier(), $serializer->serialize($data));
 
-        $message->setData(
-            new SerializedData($serializer->getIdentifier(), $serializer->serialize($data))
+        $arr = array(
+            'uuid' => $message->getUuid(),
+            'type' => $message->getType(),
+            'data' => $serializedData->toJson()
         );
 
+        $json = json_encode($arr);
         $this->eventDispatcher->dispatch(Events::ENQUEUE, new MessageEvent($message));
-        return $this->adapter->enqueue($message);
+        $json = $this->outputFilters->filter($json);
+        return $this->adapter->enqueue($json);
     }
 
     /**
@@ -82,21 +99,30 @@ class Queue
      */
     public function dequeue()
     {
-        $message = $this->adapter->dequeue();
-
-        if (!$message) {
+        $raw = $this->adapter->dequeue();
+        if (!$raw) {
             return false;
         }
 
-        $json = $message->getData();
-        $serialized = SerializedData::fromJson($json);
+        list ($json, $identifier) = $raw;
+
+        $json = $this->inputFilters->filter($json);
+
+        $json = json_decode($json, true);
+
+        $serialized = SerializedData::fromJson($json['data']);
+
         $serializer = $this->dataSerializers->getUnserializerFor($serialized);
 
         if (!$serializer) {
             throw new \RuntimeException('Unserializer not found');
         }
 
-        $message->setData($serializer->unserialize($serialized->getData()));
+        $json['data'] = $serializer->unserialize($serialized->getData());
+
+        $message = Message::fromArray($json);
+        $message->setIdentifier($identifier);
+
         $this->eventDispatcher->dispatch(Events::DEQUEUE, new MessageEvent($message));
 
         return $message;
@@ -119,7 +145,7 @@ class Queue
     public function ack(Message $message)
     {
         $this->eventDispatcher->dispatch(Events::ACK, new MessageEvent($message));
-        return $this->adapter->ack($message);
+        return $this->adapter->ack($message->getIdentifier());
     }
 
     /**
@@ -140,8 +166,32 @@ class Queue
         return $this;
     }
 
+    /**
+     * @param DataSerializer $dataSerializer
+     * @return Queue
+     */
     public function addDataSerializer(DataSerializer $dataSerializer)
     {
         $this->dataSerializers->add($dataSerializer);
+        return $this;
     }
+
+    /**
+     * @param callback $callable
+     */
+    public function addOutputFilter(Closure $callable)
+    {
+        $this->outputFilters->add($callable);
+        return $this;
+    }
+
+    /**
+     * @param callback $callable
+     */
+    public function addInputFilter(Closure $callable)
+    {
+        $this->inputFilters->add($callable);
+        return $this;
+    }
+
 }

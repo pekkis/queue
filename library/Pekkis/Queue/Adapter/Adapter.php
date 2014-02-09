@@ -16,14 +16,14 @@ interface Adapter
     /**
      * Enqueues a message
      *
-     * @param Message $message
+     * @param string $message
      */
-    public function enqueue(Message $message);
+    public function enqueue($message);
 
     /**
      * Dequeues a message
      *
-     * @return Message
+     * @return array
      */
     public function dequeue();
 
@@ -35,7 +35,7 @@ interface Adapter
     /**
      * Acknowledges a message
      *
-     * @param Message $message
+     * @param mixed $identifier
      */
-    public function ack(Message $message);
+    public function ack($identifier);
 }

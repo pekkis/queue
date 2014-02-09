@@ -71,11 +71,11 @@ class PhpAMQPAdapter implements Adapter
         return $this->channel;
     }
 
-    public function enqueue(Message $msg)
+    public function enqueue($msg)
     {
         $msg = new AMQPMessage(
-            json_encode($msg->toArray()),
-            array('content_type' => 'application/json', 'delivery-mode' => 1)
+            $msg,
+            array('content_type' => 'text/plain', 'delivery-mode' => 1)
         );
         $this->getChannel()->basic_publish($msg, $this->exchange, '', false, false);
     }
@@ -85,11 +85,13 @@ class PhpAMQPAdapter implements Adapter
         $msg = $this->getChannel()->basic_get($this->queue);
 
         if (!$msg) {
-            return null;
+            return false;
         }
 
-        $message = Message::fromArray(json_decode($msg->body, true));
-        $message->setIdentifier($msg->delivery_info['delivery_tag']);
+        return array(
+            $msg->body,
+            $msg->delivery_info['delivery_tag']
+        );
 
         return $message;
     }
@@ -99,8 +101,8 @@ class PhpAMQPAdapter implements Adapter
         return $this->getChannel()->queue_purge($this->queue);
     }
 
-    public function ack(Message $message)
+    public function ack($identifier)
     {
-        $this->getChannel()->basic_ack($message->getIdentifier());
+        $this->getChannel()->basic_ack($identifier);
     }
 }

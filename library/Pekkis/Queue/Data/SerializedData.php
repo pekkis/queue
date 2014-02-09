@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the pekkis-queue package.
+ *
+ * For copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Pekkis\Queue\Data;
 
 class SerializedData
@@ -24,6 +31,9 @@ class SerializedData
         $this->data = $data;
     }
 
+    /**
+     * @return string
+     */
     public function getSerializerIdentifier()
     {
         return $this->serializerIdentifier;
@@ -38,13 +48,8 @@ class SerializedData
     }
 
     /**
-     * @param string $data
+     * @return string
      */
-    public function setData($data)
-    {
-        $this->data = $data;
-    }
-
     public function toJson()
     {
         return json_encode(
@@ -55,6 +60,10 @@ class SerializedData
         );
     }
 
+    /**
+     * @param string $json
+     * @return SerializedData
+     */
     public static function fromJson($json)
     {
         $decoded = json_decode($json, true);

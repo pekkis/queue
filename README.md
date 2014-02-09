@@ -66,3 +66,10 @@ Supported queues
 - RabbitMQ (via PECL and pure PHP).
 - IronMQ
 - Amazon SQS
+
+Version upgrades
+-----------------
+
+Refer to UPGRADE.md
+
+

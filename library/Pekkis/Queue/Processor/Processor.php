@@ -79,10 +79,6 @@ class Processor
         if ($result->isSuccess()) {
             $this->queue->ack($message);
         }
-        foreach ($result->getMessages() as $message) {
-            $this->queue->enqueue($message);
-        }
-
         return true;
     }
 
@@ -96,7 +92,7 @@ class Processor
             if ($handler->willHandle($message)) {
                 $this->eventDispatcher->dispatch(Events::MESSAGE_BEFORE_HANDLE, new MessageEvent($message));
 
-                $ret = $handler->handle($message);
+                $ret = $handler->handle($message, $this->queue);
 
                 $this->eventDispatcher->dispatch(
                     Events::MESSAGE_AFTER_HANDLE,

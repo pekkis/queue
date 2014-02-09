@@ -69,7 +69,12 @@ class ProcessorTest extends \Pekkis\Queue\Tests\TestCase
         $this->queue->expects($this->once())->method('dequeue')->will($this->returnValue($message));
 
         $mockHandler = $this->getMock('Pekkis\Queue\Processor\MessageHandler');
-        $mockHandler->expects($this->once())->method('willHandle')->with($message)->will($this->returnValue(false));
+        $mockHandler
+            ->expects($this->once())
+            ->method('willHandle')
+            ->with($message)
+            ->will($this->returnValue(false));
+
         $mockHandler->expects($this->never())->method('handle');
 
         $this->processor->registerHandler($mockHandler);
@@ -89,7 +94,7 @@ class ProcessorTest extends \Pekkis\Queue\Tests\TestCase
      * @test
      * @dataProvider provideData
      */
-    public function newMessagesWillBeQueuedFromResponse($successfulResult)
+    public function messagesAreHandled($successfulResult)
     {
         $message = Message::create('test', array('banana' => 'is not just a banaana, banaana'));
 
@@ -99,27 +104,28 @@ class ProcessorTest extends \Pekkis\Queue\Tests\TestCase
         $mockHandler2->expects($this->never())->method('willHandle');
 
         $mockHandler = $this->getMock('Pekkis\Queue\Processor\MessageHandler');
-        $mockHandler->expects($this->once())->method('willHandle')->with($message)->will($this->returnValue(true));
+        $mockHandler
+            ->expects($this->once())
+            ->method('willHandle')
+            ->with($message)
+            ->will($this->returnValue(true));
 
         $message2 = Message::create('test', array('banana' => 'is not just a banaana, banaana'));
         $message3 = Message::create('test', array('banana' => 'is not just a banaana, banaana'));
 
         $result = new Result($successfulResult);
-        $result->addMessage($message2);
-        $result->addMessage($message3);
 
-        $mockHandler->expects($this->once())->method('handle')->will($this->returnValue($result));
+        $mockHandler
+            ->expects($this->once())
+            ->method('handle')
+            ->with($message, $this->queue)
+            ->will($this->returnValue($result));
 
         if ($successfulResult) {
             $this->queue->expects($this->once())->method('ack')->with($message);
         } else {
             $this->queue->expects($this->never())->method('ack');
         }
-
-        $this->queue
-            ->expects($this->exactly(2))
-            ->method('enqueue')
-            ->with($this->isInstanceOf('Pekkis\Queue\Message'));
 
         $this->processor->registerHandler($mockHandler2);
         $this->processor->registerHandler($mockHandler);

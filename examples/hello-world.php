@@ -14,6 +14,8 @@ $queue = new Queue(
     new EventDispatcher()
 );
 
+$queue->purge();
+
 $message = Message::create(
     'pekkis.queue.example',
     array(

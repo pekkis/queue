@@ -29,14 +29,24 @@ class ReservationHandler implements MessageHandler
      * @param Message $message
      * @return Result
      */
-    public function handle(Message $message)
+    public function handle(Message $message, Queue $queue)
     {
+        /** @var ReservationRequest $reservation */
+        $reservation = $message->getData();
+
         if (rand(1, 100) >= 75) {
             // If a result is not successful the message will stay on the queue.
             $result = new Result(false, 'Oh dear, the reservation could not be created. It will be retried... soon!');
         } else {
+
+            $msg = sprintf(
+                "Reservation created from %s to %s",
+                $reservation->getFrom()->format('Y-m-d H:i:d'),
+                $reservation->getTo()->format('Y-m-d H:i:d')
+            );
+
             // If a result is successful, the message is acked (acknowledged to be processed, removed from queue)
-            $result = new Result(true);
+            $result = new Result(true, $msg);
         }
 
         return $result;

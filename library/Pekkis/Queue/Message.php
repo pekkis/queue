@@ -13,14 +13,31 @@ use Rhumsaa\Uuid\Uuid;
 
 class Message implements Enqueueable
 {
+    /**
+     * @var string
+     */
     private $type;
 
+    /**
+     * @var string
+     */
     private $uuid;
 
-    private $data = array();
+    /**
+     * @var mixed
+     */
+    private $data;
 
+    /**
+     * @var array
+     */
     private $internal = array();
 
+    /**
+     * @param string $uuid
+     * @param string $type
+     * @param mixed $data
+     */
     private function __construct($uuid, $type, $data)
     {
         $this->uuid = $uuid;
@@ -28,32 +45,54 @@ class Message implements Enqueueable
         $this->data = $data;
     }
 
+    /**
+     * @return mixed
+     */
     public function getData()
     {
         return $this->data;
     }
 
+    /**
+     * @param mixed $data
+     */
     public function setData($data)
     {
         $this->data = $data;
     }
 
+    /**
+     * @return string
+     */
     public function getType()
     {
         return $this->type;
     }
 
+    /**
+     * @return string
+     */
     public function getUuid()
     {
         return $this->uuid;
     }
 
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @return Message
+     */
     public function setInternal($key, $value)
     {
         $this->internal[$key] = $value;
         return $this;
     }
 
+    /**
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
     public function getInternal($key, $default = null)
     {
         if (!isset($this->internal[$key])) {
@@ -62,36 +101,47 @@ class Message implements Enqueueable
         return $this->internal[$key];
     }
 
+    /**
+     * @return Message
+     */
     public function getMessage()
     {
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getIdentifier()
     {
         return $this->getInternal('identifier');
     }
 
+    /**
+     * @param string $identifier
+     * @return Message
+     */
     public function setIdentifier($identifier)
     {
-        return $this->setInternal('identifier', $identifier);
+        $this->setInternal('identifier', $identifier);
+        return $this;
     }
 
-    public static function create($type, $data = array())
+    /**
+     * @param string $type
+     * @param mixed $data
+     * @return Message
+     */
+    public static function create($type, $data = null)
     {
         return new self(Uuid::uuid4()->toString(), $type, $data);
     }
 
-    public function toArray()
-    {
-        return array(
-            'uuid' => $this->uuid,
-            'type' => $this->type,
-            'data' => $this->data->toJson()
-        );
-    }
-
-    public static function fromArray($arr)
+    /**
+     * @param array $arr
+     * @return Message
+     */
+    public static function fromArray(array $arr)
     {
         return new self($arr['uuid'], $arr['type'], $arr['data']);
     }
