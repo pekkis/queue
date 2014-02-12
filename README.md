@@ -6,12 +6,12 @@ Pekkis Queue
 A small, opinionated queue abstraction library based on discovered needs.
 Extracted from Xi Filelib and other assorted projects.
 
-What it does?
---------------
+What does it do?
+------------------
 
-Everything implementing the interface Enqueueable can be queued. A queue processor listens to a queue. Back comes a Message.
-MessageHandlers handle messages. They return a result with a success flag. New enqueueables may be queued from
-a result.
+A message consists of a topic and arbitrary data (basic serializable data supported by default, custom serializers
+can be added). Messages are moved and grooved through a queue. The library extracts a simple, 80/20 like domain
+for it's method of operation and abstracts away the differences in message queue backends.
 
 Quickstart
 -----------
