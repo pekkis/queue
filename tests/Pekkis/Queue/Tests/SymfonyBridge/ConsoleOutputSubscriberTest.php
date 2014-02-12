@@ -2,10 +2,9 @@
 
 namespace Pekkis\Queue\Tests;
 
-use Pekkis\Queue\ConsoleOutputSubscriber;
-use Pekkis\Queue\Events;
-use Pekkis\Queue\MessageEvent;
-use Pekkis\Queue\Queue;
+use Pekkis\Queue\SymfonyBridge\ConsoleOutputSubscriber;
+use Pekkis\Queue\SymfonyBridge\Events;
+use Pekkis\Queue\SymfonyBridge\MessageEvent;
 use Pekkis\Queue\Message;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;

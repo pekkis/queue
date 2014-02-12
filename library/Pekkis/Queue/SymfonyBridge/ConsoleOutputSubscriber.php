@@ -1,6 +1,6 @@
 <?php
 
-namespace Pekkis\Queue;
+namespace Pekkis\Queue\SymfonyBridge;
 
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

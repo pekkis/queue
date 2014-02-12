@@ -10,7 +10,7 @@
 namespace Pekkis\Queue\Processor;
 
 use Pekkis\Queue\Message;
-use Pekkis\Queue\Queue;
+use Pekkis\Queue\QueueInterface;
 
 interface MessageHandler
 {
@@ -24,5 +24,5 @@ interface MessageHandler
      * @param Message $message
      * @return Result
      */
-    public function handle(Message $message, Queue $queue);
+    public function handle(Message $message, QueueInterface $queue);
 }

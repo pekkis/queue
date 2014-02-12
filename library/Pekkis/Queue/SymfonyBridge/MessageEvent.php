@@ -7,9 +7,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Pekkis\Queue;
+namespace Pekkis\Queue\SymfonyBridge;
 
 use Symfony\Component\EventDispatcher\Event;
+use Pekkis\Queue\Message;
 
 class MessageEvent extends Event
 {

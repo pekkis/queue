@@ -40,10 +40,10 @@ class QueueIntegrationTest extends TestCase
         $obj->nuller = null;
 
         return array(
-            array(Message::create('lussen.meister', array())),
-            array(Message::create('lussen.meister', null)),
-            array(Message::create('lussen.meister', 'mordorin tenhunen se mehevää tikkaria lipaisee')),
-            array(Message::create('lussen.meister', $obj)),
+            array('lussen.meister', array()),
+            array('lussen.meister', null),
+            array('lussen.meister', 'mordorin tenhunen se mehevää tikkaria lipaisee'),
+            array('lussen.meister', $obj),
         );
     }
 
@@ -51,12 +51,10 @@ class QueueIntegrationTest extends TestCase
      * @dataProvider provideMessages
      * @test
      */
-    public function messagesGoThroughThePipeUnchanged(Enqueueable $enqueueable)
+    public function messagesGoThroughThePipeUnchanged($type, $data)
     {
-        $message = $enqueueable->getMessage();
-
         $this->assertFalse($this->queue->dequeue());
-        $this->queue->enqueue($enqueueable);
+        $message = $this->queue->enqueue($type, $data);
 
         $dequeued = $this->queue->dequeue();
 
@@ -68,7 +66,5 @@ class QueueIntegrationTest extends TestCase
         $this->queue->ack($dequeued);
 
         $this->assertFalse($this->queue->dequeue());
-
-        return $enqueueable;
     }
 }

@@ -9,7 +9,7 @@
 
 namespace Pekkis\Queue\Processor;
 
-use Pekkis\Queue\MessageEvent;
+use Pekkis\Queue\SymfonyBridge\MessageEvent;
 use Pekkis\Queue\Message;
 
 class ResultEvent extends MessageEvent

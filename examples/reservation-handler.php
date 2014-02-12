@@ -4,11 +4,11 @@ namespace Pekkis\Queue\Example;
 
 use Pekkis\Queue\Processor\ConsoleOutputSubscriber;
 use Pekkis\Queue\Processor\Processor;
-use Pekkis\Queue\Queue;
+use Pekkis\Queue\SymfonyBridge\EventDispatchingQueue;
 
 require_once __DIR__ . '/real-life-bootstrap.php';
 
-/** @var Queue $queue */
+/** @var EventDispatchingQueue $queue */
 
 // Queue processor has it's own console output subscriber to add to our queue.
 $queue->addSubscriber(new ConsoleOutputSubscriber($output));

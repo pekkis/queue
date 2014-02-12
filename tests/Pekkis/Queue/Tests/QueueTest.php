@@ -2,9 +2,7 @@
 
 namespace Pekkis\Queue\Tests;
 
-use Pekkis\Queue\Data\ArrayDataSerializer;
 use Pekkis\Queue\Data\SerializedData;
-use Pekkis\Queue\Events;
 use Pekkis\Queue\Queue;
 use Pekkis\Queue\Message;
 
@@ -18,13 +16,10 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
      */
     private $queue;
 
-    private $ed;
-
     public function setUp()
     {
         $this->adapter = $this->getMock('Pekkis\Queue\Adapter\Adapter');
-        $this->ed = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->queue = new Queue($this->adapter, $this->ed);
+        $this->queue = new Queue($this->adapter);
     }
 
     /**
@@ -32,8 +27,6 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
      */
     public function enqueueDelegates()
     {
-        $message = Message::create('test-message', array('aybabtu' => 'lussentus'));
-
         $this->adapter
             ->expects($this->once())
             ->method('enqueue')
@@ -46,26 +39,22 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
                 )
             );
 
-        $this->ed
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with(Events::ENQUEUE, $this->isInstanceOf('Pekkis\Queue\MessageEvent'));
-
-        $output = $this->queue->enqueue($message);
-
+        $output = $this->queue->enqueue('test-message', array('aybabtu' => 'lussentus'));
         return $output;
     }
 
     /**
      * @test
-     * @depends enqueueDelegates
      */
-    public function dequeueDelegates($input)
+    public function dequeueDelegates()
     {
-        $this->ed
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with(Events::DEQUEUE, $this->isInstanceOf('Pekkis\Queue\MessageEvent'));
+        $serialized = new SerializedData('Pekkis\Queue\Data\BasicDataSerializer', serialize('lussentus'));
+        $arr = array(
+            'uuid' => 'uuid',
+            'type' => 'lus.tus',
+            'data' => $serialized->toJson()
+        );
+        $input = json_encode($arr);
 
         $this->adapter->
             expects($this->once())
@@ -76,8 +65,8 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
         $this->assertInstanceof('Pekkis\Queue\Message', $dequeued);
 
         $this->assertEquals('aybabtu', $dequeued->getIdentifier());
-        $this->assertEquals('test-message', $dequeued->getType());
-        $this->assertEquals(array('aybabtu' => 'lussentus'), $dequeued->getData());
+        $this->assertEquals('lus.tus', $dequeued->getType());
+        $this->assertEquals('lussentus', $dequeued->getData());
     }
 
     /**
@@ -102,11 +91,6 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
         $message = Message::create('test-message', array('aybabtu' => 'lussentus'));
         $this->adapter->expects($this->once())->method('ack')->will($this->returnValue('luslus'));
 
-        $this->ed
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with(Events::ACK, $this->isInstanceOf('Pekkis\Queue\MessageEvent'));
-
         $this->assertSame('luslus', $this->queue->ack($message));
     }
 
@@ -115,34 +99,8 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
      */
     public function purgeDelegates()
     {
-        $this->ed
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with(Events::PURGE);
-
         $this->adapter->expects($this->once())->method('purge')->will($this->returnValue(true));
         $this->assertTrue($this->queue->purge());
-    }
-
-    /**
-     * @test
-     */
-    public function getterReturnsEventDispatcher()
-    {
-        $this->assertSame($this->ed, $this->queue->getEventDispatcher());
-    }
-
-    /**
-     * @test
-     */
-    public function addSubscriberDelegatesToEventDispatcher()
-    {
-        $subscriber = $this->getMock('Symfony\Component\EventDispatcher\EventSubscriberInterface');
-        $this->ed->expects($this->once())->method('addSubscriber')->with($subscriber);
-
-        $ret = $this->queue->addSubscriber($subscriber);
-        $this->assertSame($this->queue, $ret);
-
     }
 
     /**
@@ -151,10 +109,7 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
     public function unknownDataThrowsExceptionWhenSerializing()
     {
         $this->setExpectedException('RuntimeException', 'Serializer not found');
-
-        $message = Message::create('lus.tus', new RandomBusinessObject());
-
-        $this->queue->enqueue($message);
+        $this->queue->enqueue('lus.tus', new RandomBusinessObject());
     }
 
     /**
@@ -163,8 +118,6 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
     public function unknownDataThrowsExceptionWhenUnserializing()
     {
         $this->setExpectedException('RuntimeException', 'Unserializer not found');
-
-        $message = Message::create('lus.tus', new RandomBusinessObject());
 
         $serialized = new SerializedData('SomeRandomSerializer', 'xooxoo');
 

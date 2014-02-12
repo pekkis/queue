@@ -4,7 +4,7 @@ namespace Pekkis\Queue\Processor\Tests;
 
 use Pekkis\Queue\Processor\ConsoleOutputSubscriber;
 use Pekkis\Queue\Processor\Events;
-use Pekkis\Queue\MessageEvent;
+use Pekkis\Queue\SymfonyBridge\MessageEvent;
 use Pekkis\Queue\Message;
 use Pekkis\Queue\Processor\Result;
 use Pekkis\Queue\Processor\ResultEvent;

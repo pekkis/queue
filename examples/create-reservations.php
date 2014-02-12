@@ -26,5 +26,5 @@ for ($x = 1; $x <= $numberOfReservations; $x = $x + 1) {
         DateTime::createFromFormat('U', $to)
     );
 
-    $queue->enqueue(Message::create('reservation.create', $reservationRequest));
+    $queue->enqueue('reservation.create', $reservationRequest);
 }

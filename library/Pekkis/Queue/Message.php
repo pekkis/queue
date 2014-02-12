@@ -11,7 +11,7 @@ namespace Pekkis\Queue;
 
 use Rhumsaa\Uuid\Uuid;
 
-class Message implements Enqueueable
+class Message
 {
     /**
      * @var string
@@ -99,14 +99,6 @@ class Message implements Enqueueable
             return $default;
         }
         return $this->internal[$key];
-    }
-
-    /**
-     * @return Message
-     */
-    public function getMessage()
-    {
-        return $this;
     }
 
     /**

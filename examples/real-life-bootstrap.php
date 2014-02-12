@@ -7,11 +7,12 @@ require_once (is_file(__DIR__ . '/bootstrap.php')) ? __DIR__ . '/bootstrap.php' 
 use Pekkis\Queue\Adapter\IronMQAdapter;
 use Pekkis\Queue\Data\AbstractDataSerializer;
 use Pekkis\Queue\Data\DataSerializer;
-use Pekkis\Queue\Enqueueable;
 use DateTime;
 use Pekkis\Queue\Message;
-use Pekkis\Queue\ConsoleOutputSubscriber;
+use Pekkis\Queue\QueueInterface;
+use Pekkis\Queue\SymfonyBridge\ConsoleOutputSubscriber;
 use Pekkis\Queue\Queue;
+use Pekkis\Queue\SymfonyBridge\EventDispatchingQueue;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Pekkis\Queue\Processor\MessageHandler;
@@ -91,7 +92,7 @@ class ReservationHandler implements MessageHandler
      * @param Message $message
      * @return Result
      */
-    public function handle(Message $message, Queue $queue)
+    public function handle(Message $message, QueueInterface $queue)
     {
         /** @var ReservationRequest $reservation */
         $reservation = $message->getData();
@@ -116,13 +117,17 @@ class ReservationHandler implements MessageHandler
 }
 
 // Creates an IronMQ backed queue
-$queue = new Queue(
-    new IronMQAdapter(IRONMQ_TOKEN, IRONMQ_PROJECT_ID, 'pekkis-queue-example'),
+$innerQueue = new Queue(
+    new IronMQAdapter(IRONMQ_TOKEN, IRONMQ_PROJECT_ID, 'pekkis-queue-example')
+);
+// Adds our own data serializer for reservation requests
+$innerQueue->addDataSerializer(new ReservationRequestDataSerializer());
+
+// Wrap the queue with Symfony events
+$queue = new EventDispatchingQueue(
+    $innerQueue,
     new EventDispatcher()
 );
-
-// Adds our own data serializer for reservation requests
-$queue->addDataSerializer(new ReservationRequestDataSerializer());
 
 // Create a console output and attach a queue subscriber to get queue event messages to console output.
 $output = new ConsoleOutput();
