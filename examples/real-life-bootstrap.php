@@ -14,12 +14,14 @@ use Pekkis\Queue\ConsoleOutputSubscriber;
 use Pekkis\Queue\Queue;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Pekkis\Queue\Processor\MessageHandler;
+use Pekkis\Queue\Processor\Result;
 
 /**
  * Represents some random enqueueable object of relevance of your application.
  * A message in itself is an enqueueable too so you don't need to implement this if you don't need / want to.
  */
-class ReservationRequest implements Enqueueable
+class ReservationRequest
 {
     /**
      * @var \DateTime
@@ -46,16 +48,11 @@ class ReservationRequest implements Enqueueable
     {
         return $this->to;
     }
-
-    public function getMessage()
-    {
-        return Message::create(
-            'reservation.create',
-            $this
-        );
-    }
 }
 
+/**
+ * Serializes our reservation requests
+ */
 class ReservationRequestDataSerializer extends AbstractDataSerializer implements DataSerializer
 {
     public function willSerialize($unserialized)
@@ -65,23 +62,57 @@ class ReservationRequestDataSerializer extends AbstractDataSerializer implements
 
     public function serialize($reservationRequest)
     {
-        return json_encode(
-            array(
-                'from' => $reservationRequest->getFrom()->format('Y-m-d H:i:s'),
-                'to' => $reservationRequest->getTo()->format('Y-m-d H:i:s'),
-            )
-        );
+        return serialize($reservationRequest);
     }
 
     public function unserialize($serialized)
     {
-        $data = json_decode($serialized, true);
-        return new ReservationRequest(
-            DateTime::createFromFormat('Y-m-d H:i:s', $data['from']),
-            DateTime::createFromFormat('Y-m-d H:i:s', $data['to'])
-        );
+        return unserialize($serialized);
+    }
+}
+
+/**
+ * A message handler to handle messages dequeued from the queue.
+ *
+ * You can run 1-n handlers at the same time, of course.
+ */
+class ReservationHandler implements MessageHandler
+{
+    /**
+     * @param Message $message
+     * @return bool
+     */
+    public function willHandle(Message $message)
+    {
+        return ($message->getType() == 'reservation.create');
     }
 
+    /**
+     * @param Message $message
+     * @return Result
+     */
+    public function handle(Message $message, Queue $queue)
+    {
+        /** @var ReservationRequest $reservation */
+        $reservation = $message->getData();
+
+        if (rand(1, 100) >= 75) {
+            // If a result is not successful the message will stay on the queue.
+            $result = new Result(false, 'Oh dear, the reservation could not be created. It will be retried... soon!');
+        } else {
+
+            $msg = sprintf(
+                "Reservation created from %s to %s",
+                $reservation->getFrom()->format('Y-m-d H:i:d'),
+                $reservation->getTo()->format('Y-m-d H:i:d')
+            );
+
+            // If a result is successful, the message is acked (acknowledged to be processed, removed from queue)
+            $result = new Result(true, $msg);
+        }
+
+        return $result;
+    }
 }
 
 // Creates an IronMQ backed queue
@@ -90,6 +121,7 @@ $queue = new Queue(
     new EventDispatcher()
 );
 
+// Adds our own data serializer for reservation requests
 $queue->addDataSerializer(new ReservationRequestDataSerializer());
 
 // Create a console output and attach a queue subscriber to get queue event messages to console output.

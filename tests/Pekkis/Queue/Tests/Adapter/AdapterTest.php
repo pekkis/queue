@@ -11,5 +11,4 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue(interface_exists('Pekkis\Queue\Adapter\Adapter'));
     }
-
 }

@@ -6,7 +6,6 @@ use Pekkis\Queue\Processor\Result;
 
 class ResultTest extends \Pekkis\Queue\Tests\TestCase
 {
-
     /**
      * @test
      */
@@ -18,4 +17,3 @@ class ResultTest extends \Pekkis\Queue\Tests\TestCase
         $this->assertFalse($result->isSuccess());
     }
 }
-

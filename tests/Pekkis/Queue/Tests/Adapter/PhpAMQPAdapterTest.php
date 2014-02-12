@@ -21,7 +21,14 @@ class PhpAMQPAdapterTest extends TestCase
 
     protected function getAdapter()
     {
-        return new PhpAMQPAdapter(RABBITMQ_HOST, RABBITMQ_PORT, RABBITMQ_USERNAME, RABBITMQ_PASSWORD, RABBITMQ_VHOST, 'test_exchange', 'test_queue');
+        return new PhpAMQPAdapter(
+            RABBITMQ_HOST,
+            RABBITMQ_PORT,
+            RABBITMQ_USERNAME,
+            RABBITMQ_PASSWORD,
+            RABBITMQ_VHOST,
+            'test_exchange',
+            'test_queue'
+        );
     }
-
 }

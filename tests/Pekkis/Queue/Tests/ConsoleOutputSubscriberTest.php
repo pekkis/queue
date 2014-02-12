@@ -100,5 +100,4 @@ class ConsoleOutputSubscriberTest extends \Pekkis\Queue\Tests\TestCase
         $event = new Event();
         $this->ed->dispatch(Events::PURGE, $event);
     }
-
 }

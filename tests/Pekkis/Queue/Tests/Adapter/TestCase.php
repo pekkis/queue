@@ -3,8 +3,6 @@
 namespace Pekkis\Queue\Tests\Adapter;
 
 use Pekkis\Queue\Adapter\Adapter;
-use Pekkis\Queue\Data\ArrayDataSerializer;
-use Pekkis\Queue\Data\SerializedData;
 use Pekkis\Queue\Message;
 
 abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
@@ -20,15 +18,8 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
      */
     protected $message;
 
-    /**
-     * @var ArrayDataSerializer
-     */
-    protected $serializer;
-
     public function setUp()
     {
-        $this->serializer = new ArrayDataSerializer();
-
         $this->adapter = $this->getAdapter();
         $this->adapter->purge();
 
@@ -92,7 +83,7 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
         $this->assertFalse($this->adapter->dequeue());
     }
 
-   /**
+    /**
      * @test
      */
     public function queueShouldResendMessageOnlyIfMessageIsNotAcked()

@@ -40,11 +40,13 @@ class AmazonSQSAdapter implements Adapter
         $this->queueName = $queueName;
         $this->visibilityTimeout = $visibilityTimeout;
 
-        $this->client = SqsClient::factory(array(
-            'key'    => $key,
-            'secret' => $secret,
-            'region' => $region,
-        ));
+        $this->client = SqsClient::factory(
+            array(
+                'key'    => $key,
+                'secret' => $secret,
+                'region' => $region,
+            )
+        );
 
         $this->createQueue();
     }

@@ -188,7 +188,11 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
      */
     public function addsOutputFilter()
     {
-        $ret = $this->queue->addOutputFilter(function () { });
+        $ret = $this->queue->addOutputFilter(
+            function () {
+
+            }
+        );
         $this->assertSame($this->queue, $ret);
     }
 
@@ -197,7 +201,11 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
      */
     public function addsInputFilter()
     {
-        $ret = $this->queue->addInputFilter(function () { });
+        $ret = $this->queue->addInputFilter(
+            function () {
+
+            }
+        );
         $this->assertSame($this->queue, $ret);
     }
 }

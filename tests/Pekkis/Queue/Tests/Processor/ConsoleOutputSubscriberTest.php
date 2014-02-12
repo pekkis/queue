@@ -138,7 +138,4 @@ class ConsoleOutputSubscriberTest extends \Pekkis\Queue\Tests\TestCase
         $event = new ResultEvent($result, $this->message);
         $this->ed->dispatch(Events::MESSAGE_AFTER_HANDLE, $event);
     }
-
-
-
 }

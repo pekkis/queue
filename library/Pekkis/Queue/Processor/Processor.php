@@ -15,6 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Pekkis\Queue\Queue;
 use Pekkis\Queue\Message;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Closure;
 
 /**
  * Processes messages from queue
@@ -37,26 +38,45 @@ class Processor
      */
     protected $handlers = array();
 
+    /**
+     * @param Queue $queue
+     */
     public function __construct(Queue $queue)
     {
         $this->queue = $queue;
         $this->eventDispatcher = $queue->getEventDispatcher();
     }
 
+    /**
+     * @return Queue
+     */
     public function getQueue()
     {
         return $this->queue;
     }
 
+    /**
+     * @param MessageHandler $handler
+     */
     public function registerHandler(MessageHandler $handler)
     {
         array_unshift($this->handlers, $handler);
     }
 
     /**
+     * @param callable $callback
+     */
+    public function processWhile(Closure $callback)
+    {
+        do {
+            $ret = $this->process();
+        } while ($callback($ret));
+    }
+
+    /**
      * Processes a single message from the queue
      *
-     * @return boolean False if there are no messages in the queue.
+     * @return boolean True if processed, false if queue is empty.
      */
     public function process()
     {

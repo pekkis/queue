@@ -143,4 +143,29 @@ class ProcessorTest extends \Pekkis\Queue\Tests\TestCase
         $ret = $this->processor->process();
         $this->assertFalse($ret);
     }
+
+    /**
+     * @test
+     */
+    public function processWhileProcessesUntilCallbackReturnsFalse()
+    {
+        $processor = $this->getMockBuilder('Pekkis\Queue\Processor\Processor')
+            ->disableOriginalConstructor()
+            ->setMethods(array('process'))
+            ->getMock();
+
+        $processor->expects($this->exactly(100))->method('process')->will($this->returnValue(true));
+
+        $processor->processWhile(
+            function () {
+                static $count = 0;
+                $count ++;
+
+                if ($count >= 100) {
+                    return false;
+                }
+                return true;
+            }
+        );
+    }
 }

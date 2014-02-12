@@ -9,7 +9,15 @@ class PeclAMQPAdapterTest extends TestCase
 
     protected function getAdapter()
     {
-        return new PeclAMQPAdapter(RABBITMQ_HOST, RABBITMQ_PORT, RABBITMQ_USERNAME, RABBITMQ_PASSWORD, RABBITMQ_VHOST, 'filelib_test_exchange', 'filelib_test_queue');
+        return new PeclAMQPAdapter(
+            RABBITMQ_HOST,
+            RABBITMQ_PORT,
+            RABBITMQ_USERNAME,
+            RABBITMQ_PASSWORD,
+            RABBITMQ_VHOST,
+            'test_exchange',
+            'test_queue'
+        );
     }
 
     public function setUp()
@@ -21,8 +29,6 @@ class PeclAMQPAdapterTest extends TestCase
         if (!RABBITMQ_HOST) {
             $this->markTestSkipped('RabbitMQ not configured');
         }
-
         parent::setUp();
     }
-
 }

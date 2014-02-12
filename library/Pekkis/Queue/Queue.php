@@ -10,13 +10,10 @@
 namespace Pekkis\Queue;
 
 use Pekkis\Queue\Adapter\Adapter;
-use Pekkis\Queue\Data\ArrayDataSerializer;
+use Pekkis\Queue\Data\BasicDataSerializer;
 use Pekkis\Queue\Data\DataSerializer;
 use Pekkis\Queue\Data\DataSerializers;
-use Pekkis\Queue\Data\NullDataSerializer;
 use Pekkis\Queue\Data\SerializedData;
-use Pekkis\Queue\Data\StdClassDataSerializer;
-use Pekkis\Queue\Data\StringDataSerializer;
 use Pekkis\Queue\Filter\InputFilters;
 use Pekkis\Queue\Filter\OutputFilters;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -58,10 +55,7 @@ class Queue
         $this->inputFilters = new InputFilters();
 
         $this
-            ->addDataSerializer(new StdClassDataSerializer())
-            ->addDataSerializer(new ArrayDataSerializer())
-            ->addDataSerializer(new StringDataSerializer())
-            ->addDataSerializer(new NullDataSerializer());
+            ->addDataSerializer(new BasicDataSerializer());
     }
 
     /**
@@ -193,5 +187,4 @@ class Queue
         $this->inputFilters->add($callable);
         return $this;
     }
-
 }

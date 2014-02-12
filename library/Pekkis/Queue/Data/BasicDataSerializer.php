@@ -9,25 +9,31 @@
 
 namespace Pekkis\Queue\Data;
 
-class ArrayDataSerializer extends AbstractDataSerializer implements DataSerializer
+use stdClass;
+use Serializable;
+
+class BasicDataSerializer extends AbstractDataSerializer implements DataSerializer
 {
     public function willSerialize($unserialized)
     {
-        if (is_array($unserialized)) {
+        if (is_string($unserialized)
+            || is_array($unserialized)
+            || is_null($unserialized)
+            || $unserialized instanceof stdClass
+            || $unserialized instanceof Serializable
+        ) {
             return true;
         }
-
         return false;
     }
 
     public function serialize($unserialized)
     {
-        return json_encode($unserialized);
+        return serialize($unserialized);
     }
 
     public function unserialize($serialized)
     {
-        return json_decode($serialized, true);
+        return unserialize($serialized);
     }
-
 }

@@ -64,5 +64,4 @@ class MessageTest extends \Pekkis\Queue\Tests\TestCase
 
         $this->assertEquals('lussuttakeepa imaisua', $message->getData());
     }
-
 }

@@ -71,5 +71,4 @@ class QueueIntegrationTest extends TestCase
 
         return $enqueueable;
     }
-
 }
