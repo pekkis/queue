@@ -7,23 +7,21 @@
  * file that was distributed with this source code.
  */
 
-namespace Pekkis\Queue\Adapter;
+namespace Pekkis\Queue;
 
-use Pekkis\Queue\Message;
-
-interface Adapter
+Interface QueueInterface
 {
     /**
-     * Enqueues a message
-     *
-     * @param string $message
+     * @param string $type
+     * @param mixed $data
+     * @return Message
      */
-    public function enqueue($message);
+    public function enqueue($type, $data = null);
 
     /**
-     * Dequeues a message
+     * Dequeues message
      *
-     * @return array
+     * @return Message
      */
     public function dequeue();
 
@@ -33,9 +31,9 @@ interface Adapter
     public function purge();
 
     /**
-     * Acknowledges a message
+     * Acknowledges message
      *
-     * @param mixed $identifier
+     * @param Message $message
      */
-    public function ack($identifier);
+    public function ack(Message $message);
 }

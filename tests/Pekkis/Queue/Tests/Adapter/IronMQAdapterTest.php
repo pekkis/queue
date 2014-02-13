@@ -29,6 +29,4 @@ class IronMQAdapterTest extends TestCase
     {
         return 6;
     }
-
-
 }

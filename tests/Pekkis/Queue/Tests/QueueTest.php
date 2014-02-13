@@ -2,6 +2,7 @@
 
 namespace Pekkis\Queue\Tests;
 
+use Pekkis\Queue\Data\SerializedData;
 use Pekkis\Queue\Queue;
 use Pekkis\Queue\Message;
 
@@ -15,13 +16,10 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
      */
     private $queue;
 
-    private $ed;
-
     public function setUp()
     {
         $this->adapter = $this->getMock('Pekkis\Queue\Adapter\Adapter');
-        $this->ed = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->queue = new Queue($this->adapter, $this->ed);
+        $this->queue = new Queue($this->adapter);
     }
 
     /**
@@ -29,14 +27,20 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
      */
     public function enqueueDelegates()
     {
-        $message = Message::create('test-message', array('aybabtu' => 'lussentus'));
         $this->adapter
             ->expects($this->once())
             ->method('enqueue')
-            ->with($message)
-            ->will($this->returnValue('ret'));
-        $this->assertSame('ret', $this->queue->enqueue($message));
+            ->with($this->isType('string'))
+            ->will(
+                $this->returnCallback(
+                    function ($str) {
+                        return $str;
+                    }
+                )
+            );
 
+        $output = $this->queue->enqueue('test-message', array('aybabtu' => 'lussentus'));
+        return $output;
     }
 
     /**
@@ -44,10 +48,40 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
      */
     public function dequeueDelegates()
     {
-        $message = Message::create('test-message', array('aybabtu' => 'lussentus'));
-        $this->adapter->expects($this->once())->method('dequeue')->will($this->returnValue($message));
-        $this->assertSame($message, $this->queue->dequeue($message));
+        $serialized = new SerializedData('Pekkis\Queue\Data\BasicDataSerializer', serialize('lussentus'));
+        $arr = array(
+            'uuid' => 'uuid',
+            'type' => 'lus.tus',
+            'data' => $serialized->toJson()
+        );
+        $input = json_encode($arr);
+
+        $this->adapter->
+            expects($this->once())
+            ->method('dequeue')
+            ->will($this->returnValue(array($input, 'aybabtu')));
+
+        $dequeued = $this->queue->dequeue();
+        $this->assertInstanceof('Pekkis\Queue\Message', $dequeued);
+
+        $this->assertEquals('aybabtu', $dequeued->getIdentifier());
+        $this->assertEquals('lus.tus', $dequeued->getType());
+        $this->assertEquals('lussentus', $dequeued->getData());
     }
+
+    /**
+     * @test
+     */
+    public function dequeueReturnsFalseWhenQueueEmpty()
+    {
+        $this->adapter->
+            expects($this->any())
+            ->method('dequeue')
+            ->will($this->returnValue(false));
+
+        $this->assertFalse($this->queue->dequeue());
+    }
+
 
     /**
      * @test
@@ -56,6 +90,7 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
     {
         $message = Message::create('test-message', array('aybabtu' => 'lussentus'));
         $this->adapter->expects($this->once())->method('ack')->will($this->returnValue('luslus'));
+
         $this->assertSame('luslus', $this->queue->ack($message));
     }
 
@@ -71,23 +106,59 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
     /**
      * @test
      */
-    public function getterReturnsEventDispatcher()
+    public function unknownDataThrowsExceptionWhenSerializing()
     {
-        $this->assertSame($this->ed, $this->queue->getEventDispatcher());
+        $this->setExpectedException('RuntimeException', 'Serializer not found');
+        $this->queue->enqueue('lus.tus', new RandomBusinessObject());
     }
 
     /**
      * @test
      */
-    public function addSubscriberDelegatesToEventDispatcher()
+    public function unknownDataThrowsExceptionWhenUnserializing()
     {
-        $subscriber = $this->getMock('Symfony\Component\EventDispatcher\EventSubscriberInterface');
-        $this->ed->expects($this->once())->method('addSubscriber')->with($subscriber);
+        $this->setExpectedException('RuntimeException', 'Unserializer not found');
 
-        $ret = $this->queue->addSubscriber($subscriber);
-        $this->assertSame($this->queue, $ret);
+        $serialized = new SerializedData('SomeRandomSerializer', 'xooxoo');
 
+        $arr = array(
+            'uuid' => 'uuid',
+            'type' => 'lus.tus',
+            'data' => $serialized->toJson()
+        );
+        $json = json_encode($arr);
+
+        $this->adapter->
+            expects($this->once())
+            ->method('dequeue')
+            ->will($this->returnValue(array($json, 'aybabtu')));
+
+        $this->queue->dequeue();
     }
 
+    /**
+     * @test
+     */
+    public function addsOutputFilter()
+    {
+        $ret = $this->queue->addOutputFilter(
+            function () {
 
+            }
+        );
+        $this->assertSame($this->queue, $ret);
+    }
+
+    /**
+     * @test
+     */
+    public function addsInputFilter()
+    {
+        $ret = $this->queue->addInputFilter(
+            function () {
+
+            }
+        );
+        $this->assertSame($this->queue, $ret);
+    }
 }

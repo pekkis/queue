@@ -20,11 +20,15 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
 
     public function setUp()
     {
-        $this->message = Message::create('test-message', array('aybabtu' => 'lussentus'));
         $this->adapter = $this->getAdapter();
         $this->adapter->purge();
+
+        $this->message = 'test-message';
     }
 
+    /**
+     * @return Adapter
+     */
     abstract protected function getAdapter();
 
     protected function getSleepyTime()
@@ -32,32 +36,33 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
         return 1;
     }
 
+    protected function createMessage($type, array $data)
+    {
+    }
+
+
     /**
      * @test
-     * @return Queue
      */
     public function dequeueShouldDequeueEnqueuedMessage()
     {
         $this->adapter->enqueue($this->message);
 
-        $message = $this->adapter->dequeue();
-        $this->assertInstanceOf('Pekkis\Queue\Message', $message);
-        $this->adapter->ack($message);
+        list ($message, $identifier) = $this->adapter->dequeue();
+        $this->assertEquals($this->message, $message);
 
-        $this->assertEquals($this->message->getData(), $message->getData());
-        $this->assertEquals($this->message->getUuid(), $message->getUuid());
-        $this->assertEquals($this->message->getType(), $message->getType());
+        $this->adapter->ack($identifier);
 
-        $this->assertNotNull($message->getIdentifier());
+        $this->assertFalse($this->adapter->dequeue());
     }
 
     /**
      * @test
      */
-    public function dequeueShouldReturnNullIfQueueIsEmpty()
+    public function dequeueShouldReturnFalseIfQueueIsEmpty()
     {
         $message = $this->adapter->dequeue();
-        $this->assertNull($message);
+        $this->assertFalse($message);
     }
 
     /**
@@ -66,34 +71,35 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
     public function purgeShouldResultInAnEmptyQueue()
     {
         for ($x = 10; $x <= 10; $x++) {
-            $this->adapter->enqueue(Message::create('testosteron', array('count' => $x)));
+            $this->adapter->enqueue("message {$x}");
         }
 
-        $msg = $this->adapter->dequeue();
-        $this->assertNotNull($msg);
-        $this->adapter->ack($msg);
+        list ($msg, $identifier) = $this->adapter->dequeue();
+        $this->assertInternalType('string', $msg);
+        $this->adapter->ack($identifier);
 
         $this->adapter->purge();
 
-        $this->assertNull($this->adapter->dequeue());
-
+        $this->assertFalse($this->adapter->dequeue());
     }
 
-   /**
+    /**
      * @test
      */
-    public function queueShouldResendIfMessageIsNotAcked()
+    public function queueShouldResendMessageOnlyIfMessageIsNotAcked()
     {
         $queue = $this->getAdapter();
         $queue->purge();
 
-        $this->assertNull($queue->dequeue());
+        $this->assertFalse($queue->dequeue());
 
-        $message = Message::create('testosteron', array('mucho' => 'masculino'));
+        $message = 'messago mucho masculino';
         $queue->enqueue($message);
 
-        $this->assertInstanceOf('Pekkis\Queue\Message', $queue->dequeue());
-        $this->assertNull($queue->dequeue());
+        list ($dequeued, $identifier) = $queue->dequeue();
+
+        $this->assertEquals($message, $dequeued);
+        $this->assertFalse($queue->dequeue());
 
         unset($queue);
         gc_collect_cycles();
@@ -104,11 +110,19 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
 
         $queue = $this->getAdapter();
 
-        $msg = $queue->dequeue();
-        $this->assertInstanceOf('Pekkis\Queue\Message', $msg);
+        list ($dequeued, $identifier) = $queue->dequeue();
+        $this->assertEquals($message, $dequeued);
 
-        $queue->ack($msg);
+        $queue->ack($identifier);
 
+        unset($queue);
+        gc_collect_cycles();
+
+        if ($sleepyTime = $this->getSleepyTime()) {
+            sleep($sleepyTime);
+        }
+
+        $queue = $this->getAdapter();
+        $this->assertFalse($queue->dequeue());
     }
-
 }

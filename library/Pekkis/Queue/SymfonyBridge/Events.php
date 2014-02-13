@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Pekkis\Queue;
+namespace Pekkis\Queue\SymfonyBridge;
 
 class Events
 {

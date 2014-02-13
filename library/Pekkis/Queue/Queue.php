@@ -10,10 +10,15 @@
 namespace Pekkis\Queue;
 
 use Pekkis\Queue\Adapter\Adapter;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Pekkis\Queue\Data\BasicDataSerializer;
+use Pekkis\Queue\Data\DataSerializer;
+use Pekkis\Queue\Data\DataSerializers;
+use Pekkis\Queue\Data\SerializedData;
+use Pekkis\Queue\Filter\InputFilters;
+use Pekkis\Queue\Filter\OutputFilters;
+use Closure;
 
-class Queue
+class Queue implements QueueInterface
 {
     /**
      * @var Adapter
@@ -21,30 +26,61 @@ class Queue
     private $adapter;
 
     /**
-     * @var EventDispatcherInterface
+     * @var DataSerializers
      */
-    private $eventDispatcher;
+    private $dataSerializers;
+
+    /**
+     * @var OutputFilters
+     */
+    private $outputFilters;
+
+    /**
+     * @var InputFilters
+     */
+    private $inputFilters;
 
     /**
      * @param Adapter $adapter
-     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(Adapter $adapter, EventDispatcherInterface $eventDispatcher)
+    public function __construct(Adapter $adapter)
     {
         $this->adapter = $adapter;
-        $this->eventDispatcher = $eventDispatcher;
+
+        $this->dataSerializers = new DataSerializers();
+
+        $this->outputFilters = new OutputFilters();
+        $this->inputFilters = new InputFilters();
+
+        $this
+            ->addDataSerializer(new BasicDataSerializer());
     }
 
     /**
-     * Enqueues message
-     *
-     * @param Enqueueable $enqueueable
+     * @param string $type
+     * @param mixed $data
+     * @return Message
+     * @throws \RuntimeException
      */
-    public function enqueue(Enqueueable $enqueueable)
+    public function enqueue($type, $data = null)
     {
-        $message = $enqueueable->getMessage();
-        $this->eventDispatcher->dispatch(Events::ENQUEUE, new MessageEvent($message));
-        return $this->adapter->enqueue($message);
+        $serializer = $this->dataSerializers->getSerializerFor($data);
+        if (!$serializer) {
+            throw new \RuntimeException("Serializer not found");
+        }
+        $serializedData = new SerializedData($serializer->getIdentifier(), $serializer->serialize($data));
+
+        $message = Message::create($type, $data);
+        $arr = array(
+            'uuid' => $message->getUuid(),
+            'type' => $message->getType(),
+            'data' => $serializedData->toJson()
+        );
+
+        $json = json_encode($arr);
+        $json = $this->outputFilters->filter($json);
+        $this->adapter->enqueue($json);
+        return $message;
     }
 
     /**
@@ -54,10 +90,24 @@ class Queue
      */
     public function dequeue()
     {
-        $message = $this->adapter->dequeue();
-        if ($message) {
-            $this->eventDispatcher->dispatch(Events::DEQUEUE, new MessageEvent($message));
+        $raw = $this->adapter->dequeue();
+        if (!$raw) {
+            return false;
         }
+
+        list ($json, $identifier) = $raw;
+        $json = $this->inputFilters->filter($json);
+        $json = json_decode($json, true);
+        $serialized = SerializedData::fromJson($json['data']);
+        $serializer = $this->dataSerializers->getUnserializerFor($serialized);
+
+        if (!$serializer) {
+            throw new \RuntimeException('Unserializer not found');
+        }
+
+        $json['data'] = $serializer->unserialize($serialized->getData());
+        $message = Message::fromArray($json);
+        $message->setIdentifier($identifier);
         return $message;
     }
 
@@ -66,7 +116,6 @@ class Queue
      */
     public function purge()
     {
-        $this->eventDispatcher->dispatch(Events::PURGE);
         return $this->adapter->purge();
     }
 
@@ -77,25 +126,34 @@ class Queue
      */
     public function ack(Message $message)
     {
-        $this->eventDispatcher->dispatch(Events::ACK, new MessageEvent($message));
-        return $this->adapter->ack($message);
+        return $this->adapter->ack($message->getIdentifier());
     }
 
     /**
-     * @return EventDispatcherInterface
-     */
-    public function getEventDispatcher()
-    {
-        return $this->eventDispatcher;
-    }
-
-    /**
-     * @param EventSubscriberInterface $subscriber
+     * @param DataSerializer $dataSerializer
      * @return Queue
      */
-    public function addSubscriber(EventSubscriberInterface $subscriber)
+    public function addDataSerializer(DataSerializer $dataSerializer)
     {
-        $this->eventDispatcher->addSubscriber($subscriber);
+        $this->dataSerializers->add($dataSerializer);
+        return $this;
+    }
+
+    /**
+     * @param callback $callable
+     */
+    public function addOutputFilter(Closure $callable)
+    {
+        $this->outputFilters->add($callable);
+        return $this;
+    }
+
+    /**
+     * @param callback $callable
+     */
+    public function addInputFilter(Closure $callable)
+    {
+        $this->inputFilters->add($callable);
         return $this;
     }
 }

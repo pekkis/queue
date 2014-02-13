@@ -1,11 +1,18 @@
 <?php
 
+/**
+ * This file is part of the pekkis-queue package.
+ *
+ * For copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Pekkis\Queue\Processor;
 
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\Event;
-use Pekkis\Queue\MessageEvent;
+use Pekkis\Queue\SymfonyBridge\MessageEvent;
 
 class ConsoleOutputSubscriber implements EventSubscriberInterface
 {

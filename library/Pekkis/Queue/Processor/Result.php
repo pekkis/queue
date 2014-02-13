@@ -9,15 +9,17 @@
 
 namespace Pekkis\Queue\Processor;
 
-use Pekkis\Queue\Enqueueable;
-
 class Result
 {
+    /**
+     * @var bool
+     */
     private $success;
 
+    /**
+     * @var string
+     */
     private $resultMessage = '';
-
-    private $messages = array();
 
     public function __construct($success = true, $resultMessage = '')
     {
@@ -25,24 +27,19 @@ class Result
         $this->resultMessage = $resultMessage;
     }
 
-    public function addMessage(Enqueueable $enqueueable)
-    {
-        $this->messages[] = $enqueueable->getMessage();
-    }
-
+    /**
+     * @return bool
+     */
     public function isSuccess()
     {
         return $this->success;
     }
 
+    /**
+     * @return string
+     */
     public function getResultMessage()
     {
         return $this->resultMessage;
     }
-
-    public function getMessages()
-    {
-        return $this->messages;
-    }
-
 }

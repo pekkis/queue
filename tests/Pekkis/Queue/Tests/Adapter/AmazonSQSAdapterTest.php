@@ -6,7 +6,6 @@ use Pekkis\Queue\Adapter\AmazonSQSAdapter;
 
 class AmazonSQSAdapterTest extends TestCase
 {
-
     protected function getAdapter()
     {
         return new AmazonSQSAdapter(
@@ -30,6 +29,4 @@ class AmazonSQSAdapterTest extends TestCase
     {
         return 6;
     }
-
-
 }

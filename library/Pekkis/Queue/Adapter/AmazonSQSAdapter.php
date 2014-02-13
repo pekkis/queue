@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the pekkis-queue package.
+ *
+ * For copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Pekkis\Queue\Adapter;
 
 use Aws\Sqs\SqsClient;
@@ -33,11 +40,13 @@ class AmazonSQSAdapter implements Adapter
         $this->queueName = $queueName;
         $this->visibilityTimeout = $visibilityTimeout;
 
-        $this->client = SqsClient::factory(array(
-            'key'    => $key,
-            'secret' => $secret,
-            'region' => $region,
-        ));
+        $this->client = SqsClient::factory(
+            array(
+                'key'    => $key,
+                'secret' => $secret,
+                'region' => $region,
+            )
+        );
 
         $this->createQueue();
     }
@@ -53,37 +62,36 @@ class AmazonSQSAdapter implements Adapter
 
         $messages = $result->get('Messages');
         if (!$messages) {
-            return null;
+            return false;
         }
 
-        $message = Message::fromArray(json_decode($messages[0]['Body'], true));
-        $message->setIdentifier($messages[0]['ReceiptHandle']);
-        return $message;
+        return array($messages[0]['Body'], $messages[0]['ReceiptHandle']);
     }
 
-    public function enqueue(Message $message)
+    public function enqueue($message)
     {
         $this->client->sendMessage(
             array(
                 'QueueUrl'    => $this->queueUrl,
-                'MessageBody' => json_encode($message->toArray()),
+                'MessageBody' => $message,
             )
         );
     }
 
     public function purge()
     {
-        while ($message = $this->dequeue()) {
-            $this->ack($message);
+        while ($dequeued = $this->dequeue()) {
+            list ($message, $identifier) = $dequeued;
+            $this->ack($identifier);
         }
     }
 
-    public function ack(Message $message)
+    public function ack($identifier)
     {
         $this->client->deleteMessage(
             array(
                 'QueueUrl' => $this->queueUrl,
-                'ReceiptHandle' => $message->getIdentifier(),
+                'ReceiptHandle' => $identifier,
             )
         );
     }

@@ -64,9 +64,8 @@ class PeclAMQPAdapter implements Adapter
 
     }
 
-    public function enqueue(Message $msg)
+    public function enqueue($msg)
     {
-        $msg = json_encode($msg->toArray());
         $this->exchange->publish($msg, '');
     }
 
@@ -74,13 +73,10 @@ class PeclAMQPAdapter implements Adapter
     {
         $msg = $this->queue->get();
         if (!$msg) {
-            return null;
+            return false;
         }
 
-        $message = Message::fromArray(json_decode($msg->getBody(), true));
-        $message->setIdentifier($msg->getDeliveryTag());
-
-        return $message;
+        return array($msg->getBody(), $msg->getDeliveryTag());
     }
 
     public function purge()
@@ -88,9 +84,9 @@ class PeclAMQPAdapter implements Adapter
         return $this->queue->purge();
     }
 
-    public function ack(Message $message)
+    public function ack($identifier)
     {
-        $this->queue->ack($message->getIdentifier());
+        $this->queue->ack($identifier);
     }
 
     public function __destruct()

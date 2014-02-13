@@ -10,7 +10,7 @@ class MessageTest extends \Pekkis\Queue\Tests\TestCase
     /**
      * @test
      */
-    public function messageShouldInitializeProperly()
+    public function initializesProperly()
     {
         $type = 'test';
         $data = array('message' => 'All your base are belong to us');
@@ -26,7 +26,7 @@ class MessageTest extends \Pekkis\Queue\Tests\TestCase
     /**
      * @test
      */
-    public function shouldBeRestorableFromArray()
+    public function isRestorableFromArray()
     {
         $arr = array(
             'uuid' => 'lussutus-uuid',
@@ -44,14 +44,24 @@ class MessageTest extends \Pekkis\Queue\Tests\TestCase
     /**
      * @test
      */
-    public function internalDataShouldWork()
+    public function internalDataWorks()
     {
         $message = Message::create('luss', array('mussutus' => 'kovaa mussutusta'));
 
         $this->assertNull($message->getIdentifier());
         $this->assertSame($message, $message->setIdentifier('loso'));
         $this->assertEquals('loso', $message->getIdentifier());
-
     }
 
+    /**
+     * @test
+     */
+    public function setDataSetsData()
+    {
+        $message = Message::create('luss', array('mussutus' => 'kovaa mussutusta'));
+
+        $message->setData('lussuttakeepa imaisua');
+
+        $this->assertEquals('lussuttakeepa imaisua', $message->getData());
+    }
 }

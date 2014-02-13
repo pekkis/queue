@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of the pekkis-queue package.
+ *
+ * For copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Pekkis\Queue\Adapter;
 
 use IronMQ;
@@ -46,52 +53,20 @@ class IronMQAdapter implements Adapter
             )
         );
         $this->queueName = $queueName;
-        $this->setTimeout($timeout);
-        $this->setExpiresIn($expiresIn);
-    }
-
-    /**
-     * @param int $timeout
-     */
-    public function setTimeout($timeout)
-    {
         $this->timeout = $timeout;
-    }
-
-    /**
-     * @return int
-     */
-    public function getTimeout()
-    {
-        return $this->timeout;
-    }
-
-    /**
-     * @param int $expiresIn
-     */
-    public function setExpiresIn($expiresIn)
-    {
         $this->expiresIn = $expiresIn;
-    }
-
-    /**
-     * @return int
-     */
-    public function getExpiresIn()
-    {
-        return $this->expiresIn;
     }
 
     /**
      * @param Message $msg
      * @return bool
      */
-    public function enqueue(Message $msg)
+    public function enqueue($message)
     {
         try {
             $this->queue->postMessage(
                 $this->queueName,
-                json_encode($msg->toArray()),
+                $message,
                 array(
                     'timeout' => $this->timeout,
                     'expires_in' => $this->expiresIn
@@ -107,12 +82,10 @@ class IronMQAdapter implements Adapter
     {
         $rawMsg = $this->queue->getMessage($this->queueName, $this->timeout);
         if (!$rawMsg) {
-            return null;
+            return false;
         }
 
-        $msg = Message::fromArray(json_decode($rawMsg->body, true));
-        $msg->setIdentifier($rawMsg->id);
-        return $msg;
+        return array($rawMsg->body, $rawMsg->id);
     }
 
     public function purge()
@@ -128,8 +101,8 @@ class IronMQAdapter implements Adapter
         }
     }
 
-    public function ack(Message $message)
+    public function ack($identifier)
     {
-        $this->queue->deleteMessage($this->queueName, $message->getIdentifier());
+        $this->queue->deleteMessage($this->queueName, $identifier);
     }
 }
