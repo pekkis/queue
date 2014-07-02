@@ -6,20 +6,22 @@ php:
   - 5.5
 
 env:
+  global:
+    secure: "IQbi5ezBvpYNKr/aGABUcUv+rGAh+dAaiLpz9Etbw9nkaUCO3IPN1UxCCu21jDl4GRatj+pfZwySJOFx8GJN++gKzFiZiuX1e72eriQ6zW1Kthkh9R8Tm/hPUAAFYzzh0cXLzxhZjKzWFOFIyOstJNkMYkTFYJy4aC4EdIZDbXY="
+    secure: "lnDaNYXEXLQGqJxwlywPJ7U8QfzQKlt+yUxvyEgqg/fMtNvd0wJfwfbV7xTJrikyP3DsTLsalsv7imwHGHf9jn/892jCLb843yokzM+KP298yCXVKBXFP1dxjiJYBqTjmHGMnb/D7fyjPCc34w3+KxgxnrXkR72ha0411wRXoh4="
+    secure: "HWLhH7vbQkG0Lx9uv+Gv78wuqMbl88RrvwrSSLSWoICGOsu6EZ4VqiTb9NFzT9IhTgBS5knNMQJn6131Fgtjzs2zYvyz9SM1tZp6QYJTBv2hiz5R/jEX2jbh05ZpkNI21rpsBV0KiKipBnu+K4CyDqkBTvu7qpYgERVEUWXDTM4="
+    secure: "cIONe9K2X9jLc0scBZWvTpg1uW7b/3BAAIH71tlFWsUbmlhKC6bRjv8R13SA2VijaE5cu8VcRdkpwjIjI2HrE2nMgQHAtoYfL8vwPxwiLYCFxj4yQfg7ovBHd9mi1L7P+K/PNVaHW0uS/SVoq+dJ8RR3tbCb6+k5TtxMkq5iaM0="
 
 services:
   - rabbitmq
 
 before_script:
   - curl -s http://getcomposer.org/installer | php && php composer.phar install --dev
-  - pyrus channel-discover pear.symfony.com
-  - pyrus install -o pear.phpunit.de/PHPUnit
-  - pyrus install -o pear.phpunit.de/DbUnit
   - phpenv rehash
   - sudo apt-get install -y librabbitmq-dev
-  - wget http://pecl.php.net/get/amqp-1.2.0.tgz
-  - tar -xzf amqp-1.2.0.tgz
-  - sh -c "cd amqp-1.2.0 && phpize && ./configure && make && sudo make install"
+  - wget http://pecl.php.net/get/amqp-1.4.0.tgz
+  - tar -xzf amqp-1.4.0.tgz
+  - sh -c "cd amqp-1.4.0 && phpize && ./configure && make && sudo make install"
   - echo "extension=amqp.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
 
-script: cd tests && phpunit -v --configuration phpunit.xml.travis
+script: cd tests && ../vendor/bin/phpunit -v --configuration phpunit.xml.travis

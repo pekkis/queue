@@ -16,22 +16,18 @@
 
     "require": {
         "php": ">=5.3.3",
-        "symfony/console": ">=2.2.0",
-        "symfony/event-dispatcher": ">=2.2.0",
-        "rhumsaa/uuid": "2.3.*"
+        "symfony/console": "~2.2",
+        "symfony/event-dispatcher": "~2.2",
+        "rhumsaa/uuid": "~2.3",
+        "videlalvaro/php-amqplib": "~2.4",
+        "iron-io/iron_mq": "~1.5",
+        "aws/aws-sdk-php": "~2.6"
     },
 
     "require-dev": {
-        "videlalvaro/php-amqplib": ">=dev-master@dev",
-        "iron-io/iron_mq": "1.4.*",
-        "aws/aws-sdk-php": "2.*"
-    },
-
-    "suggest": {
-        "ext-amqp": "AMQP extension for RabbitMQ support",
-        "videlalvaro/php-amqplib": "Pure PHP library for RabbitMQ support",
-        "iron-io/iron_mq": "For IronMQ support",
-        "aws/aws-sdk-php": "For Amazon SQS support"
+        "phpunit/phpunit": "~4.0",
+        "phpunit/phpunit-mock-objects": "~2.0",
+        "phpunit/dbunit": "1.3.*"
     },
 
     "autoload": {

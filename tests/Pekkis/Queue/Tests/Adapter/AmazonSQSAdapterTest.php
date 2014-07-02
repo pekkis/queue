@@ -9,17 +9,17 @@ class AmazonSQSAdapterTest extends TestCase
     protected function getAdapter()
     {
         return new AmazonSQSAdapter(
-            SQS_KEY,
-            SQS_SECRET,
+            getenv('SQS_KEY'),
+            getenv('SQS_SECRET'),
             SQS_REGION,
-            'pekkis-queue-test',
+            SQS_QUEUE_NAME,
             3
         );
     }
 
     public function setUp()
     {
-        if (!SQS_KEY || !SQS_SECRET || !SQS_REGION) {
+        if (!getenv('SQS_KEY') || !getenv('SQS_SECRET') || !SQS_REGION || !SQS_QUEUE_NAME) {
             $this->markTestSkipped("SQS credentials not configured");
         }
         parent::setUp();
