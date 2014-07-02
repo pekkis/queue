@@ -7,6 +7,10 @@ php:
 
 env:
   global:
+    - secure: "IQbi5ezBvpYNKr/aGABUcUv+rGAh+dAaiLpz9Etbw9nkaUCO3IPN1UxCCu21jDl4GRatj+pfZwySJOFx8GJN++gKzFiZiuX1e72eriQ6zW1Kthkh9R8Tm/hPUAAFYzzh0cXLzxhZjKzWFOFIyOstJNkMYkTFYJy4aC4EdIZDbXY="
+    - secure: "lnDaNYXEXLQGqJxwlywPJ7U8QfzQKlt+yUxvyEgqg/fMtNvd0wJfwfbV7xTJrikyP3DsTLsalsv7imwHGHf9jn/892jCLb843yokzM+KP298yCXVKBXFP1dxjiJYBqTjmHGMnb/D7fyjPCc34w3+KxgxnrXkR72ha0411wRXoh4="
+    - secure: "HWLhH7vbQkG0Lx9uv+Gv78wuqMbl88RrvwrSSLSWoICGOsu6EZ4VqiTb9NFzT9IhTgBS5knNMQJn6131Fgtjzs2zYvyz9SM1tZp6QYJTBv2hiz5R/jEX2jbh05ZpkNI21rpsBV0KiKipBnu+K4CyDqkBTvu7qpYgERVEUWXDTM4="
+    - secure: "cIONe9K2X9jLc0scBZWvTpg1uW7b/3BAAIH71tlFWsUbmlhKC6bRjv8R13SA2VijaE5cu8VcRdkpwjIjI2HrE2nMgQHAtoYfL8vwPxwiLYCFxj4yQfg7ovBHd9mi1L7P+K/PNVaHW0uS/SVoq+dJ8RR3tbCb6+k5TtxMkq5iaM0="
 
 services:
   - rabbitmq
