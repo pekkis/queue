@@ -11,8 +11,6 @@ namespace Pekkis\Queue\Processor;
 
 use Pekkis\Queue\SymfonyBridge\EventDispatchingQueue;
 use Pekkis\Queue\SymfonyBridge\MessageEvent;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Output\OutputInterface;
 use Pekkis\Queue\Queue;
 use Pekkis\Queue\Message;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -49,7 +47,7 @@ class Processor
     }
 
     /**
-     * @return Queue
+     * @return EventDispatchingQueue
      */
     public function getQueue()
     {

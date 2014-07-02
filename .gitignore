@@ -3,3 +3,4 @@ composer.lock
 tests/phpunit.xml
 tests/php_errors.log
 examples/php_errors.log
+vendor/

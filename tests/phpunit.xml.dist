@@ -11,10 +11,11 @@
         <const name="RABBITMQ_VHOST" value="/" />
         <const name="RABBITMQ_USERNAME" value="guest" />
         <const name="RABBITMQ_PASSWORD" value="guest" />
-        <const name="IRONMQ_TOKEN" value="" />
-        <const name="IRONMQ_PROJECT_ID" value="" />
-        <const name="SQS_KEY" value="" />
-        <const name="SQS_SECRET" value="" />
+        <env name="IRONMQ_TOKEN" value="" />
+        <env name="IRONMQ_PROJECT_ID" value="" />
+        <env name="SQS_KEY" value="" />
+        <env name="SQS_SECRET" value="" />
         <const name="SQS_REGION" value="eu-west-1" />
+        <const name="SQS_QUEUE_NAME" value="" />
     </php>
 </phpunit>
