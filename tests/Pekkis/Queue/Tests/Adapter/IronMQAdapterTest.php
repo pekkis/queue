@@ -6,6 +6,14 @@ use Pekkis\Queue\Adapter\IronMQAdapter;
 
 class IronMQAdapterTest extends TestCase
 {
+    public function setUp()
+    {
+        if (!getenv('IRONMQ_TOKEN') || !getenv('IRONMQ_PROJECT_ID')) {
+            $this->markTestSkipped("IronMQ credentials not configured");
+        }
+
+        parent::setUp();
+    }
 
     protected function getAdapter()
     {
@@ -13,16 +21,10 @@ class IronMQAdapterTest extends TestCase
             getenv('IRONMQ_TOKEN'),
             getenv('IRONMQ_PROJECT_ID'),
             'pekkis-queue-test',
-            3
+            3,
+            604800,
+            getenv('IRONMQ_HOST') ?: null
         );
-    }
-
-    public function setUp()
-    {
-        if (!getenv('IRONMQ_TOKEN') || !getenv('IRONMQ_PROJECT_ID')) {
-            $this->markTestSkipped("IronMQ credentials not configured");
-        }
-        parent::setUp();
     }
 
     protected function getSleepyTime()

@@ -43,15 +43,18 @@ class IronMQAdapter implements Adapter
      * @param string $queueName
      * @param int $timeout
      * @param int $expiresIn
+     * @param string $host
      */
-    public function __construct($token, $projectId, $queueName, $timeout = 60, $expiresIn = 604800)
+    public function __construct($token, $projectId, $queueName, $timeout = 60, $expiresIn = 604800, $host = null)
     {
         $this->queue = new IronMQ(
             array(
                 'token' => $token,
-                'project_id' => $projectId
+                'project_id' => $projectId,
+                'host' => $host
             )
         );
+
         $this->queueName = $queueName;
         $this->timeout = $timeout;
         $this->expiresIn = $expiresIn;
