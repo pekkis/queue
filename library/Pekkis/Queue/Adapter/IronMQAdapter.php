@@ -9,7 +9,7 @@
 
 namespace Pekkis\Queue\Adapter;
 
-use IronMQ;
+use IronMQ\IronMQ;
 use Pekkis\Queue\Message;
 
 /**
