@@ -92,8 +92,6 @@ class PhpAMQPAdapter implements Adapter
             $msg->body,
             $msg->delivery_info['delivery_tag']
         );
-
-        return $message;
     }
 
     public function purge()
