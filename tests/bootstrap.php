@@ -9,7 +9,7 @@ php composer.phar install --dev
 
 gc_enable();
 
-define('ROOT_TESTS', realpath(__DIR__));
+!defined('ROOT_TESTS') && define('ROOT_TESTS', realpath(__DIR__));
 
 // Autoload test classes
 spl_autoload_register(function($class) {
