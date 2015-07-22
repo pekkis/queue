@@ -4,7 +4,6 @@ namespace Pekkis\Queue\Example;
 
 use Pekkis\Queue\Queue;
 use DateTime;
-use Pekkis\Queue\Message;
 
 require_once __DIR__ . '/real-life-bootstrap.php';
 
