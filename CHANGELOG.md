@@ -6,6 +6,7 @@
 - Handles dequeue errors in processor.
 - Fixed segmentation faulting in tests.
 - Bumped PHP requirement to 5.5+.
+- Updated SQS adapter to use version 3 of the SDK.
 
 ## 0.4
 
