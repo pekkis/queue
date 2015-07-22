@@ -71,9 +71,4 @@ Supported queues
 Version upgrades
 -----------------
 
-Refer to UPGRADE.md
-
-Todo
------
-
-SymfonyBridge and Processor sub-packages will be separated to exist in their own packages.
+Refer to CHANGELOG.md
