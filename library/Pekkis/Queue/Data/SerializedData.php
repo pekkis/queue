@@ -9,6 +9,8 @@
 
 namespace Pekkis\Queue\Data;
 
+use Pekkis\Queue\RuntimeException;
+
 class SerializedData
 {
     /**
@@ -52,12 +54,20 @@ class SerializedData
      */
     public function toJson()
     {
-        return json_encode(
+        $encoded = json_encode(
             array(
                 'serializerIdentifier' => $this->serializerIdentifier,
                 'data' => $this->data,
             )
         );
+
+        if (false === $encoded) {
+            throw new RuntimeException(
+                sprintf("Failed to JSON encode serialized data with '%s'", $this->data)
+            );
+        }
+
+        return $encoded;
     }
 
     /**

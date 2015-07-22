@@ -1,8 +1,14 @@
-UPGRADING
-==========
+# CHANGELOG
 
-From 0.3 to 0.4
-----------------
+## 1.0
+
+- Throws namespaced exceptions instead of generic RuntimeException ones.
+- Handles dequeue errors in processor.
+- Fixed segmentation faulting in tests.
+- Bumped PHP requirement to 5.5+.
+- Updated SQS adapter to use version 3 of the SDK.
+
+## 0.4
 
 - Queue: Symfony specific stuff was moved to SymfonyBridge. If you rely on Symfony events, use
   the EventDispatchingQueue wrapper for queue.

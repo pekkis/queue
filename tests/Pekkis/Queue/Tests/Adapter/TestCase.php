@@ -21,8 +21,6 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
     public function setUp()
     {
         $this->adapter = $this->getAdapter();
-        $this->adapter->purge();
-
         $this->message = 'test-message';
     }
 
@@ -46,6 +44,8 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
      */
     public function dequeueShouldDequeueEnqueuedMessage()
     {
+        $this->adapter->purge();
+
         $this->adapter->enqueue($this->message);
 
         list ($message, $identifier) = $this->adapter->dequeue();
@@ -61,6 +61,7 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
      */
     public function dequeueShouldReturnFalseIfQueueIsEmpty()
     {
+        $this->adapter->purge();
         $message = $this->adapter->dequeue();
         $this->assertFalse($message);
     }
@@ -70,6 +71,8 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
      */
     public function purgeShouldResultInAnEmptyQueue()
     {
+        $this->adapter->purge();
+
         for ($x = 10; $x <= 10; $x++) {
             $this->adapter->enqueue("message {$x}");
         }
@@ -85,6 +88,7 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
 
     /**
      * @test
+     * @runInSeparateProcess
      */
     public function queueShouldResendMessageOnlyIfMessageIsNotAcked()
     {
@@ -101,9 +105,18 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
         $this->assertEquals($message, $dequeued);
         $this->assertFalse($queue->dequeue());
 
-        unset($queue);
-        gc_collect_cycles();
+        return $message;
+    }
 
+    /**
+     * @test
+     * @param $message
+     * @depends queueShouldResendMessageOnlyIfMessageIsNotAcked
+     * @runInSeparateProcess
+     *
+     */
+    public function queueShouldResendMessageOnlyIfMessageIsNotAcked2($message)
+    {
         if ($sleepyTime = $this->getSleepyTime()) {
             sleep($sleepyTime);
         }
@@ -114,10 +127,17 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
         $this->assertEquals($message, $dequeued);
 
         $queue->ack($identifier);
+    }
 
-        unset($queue);
-        gc_collect_cycles();
-
+    /**
+     * @test
+     * @param $message
+     * @depends queueShouldResendMessageOnlyIfMessageIsNotAcked2
+     * @runInSeparateProcess
+     *
+     */
+    public function queueShouldResendMessageOnlyIfMessageIsNotAcked3($message)
+    {
         if ($sleepyTime = $this->getSleepyTime()) {
             sleep($sleepyTime);
         }

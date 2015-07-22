@@ -15,6 +15,7 @@ use Pekkis\Queue\Queue;
 use Pekkis\Queue\Message;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Closure;
+use Pekkis\Queue\RuntimeException;
 
 /**
  * Processes messages from queue
@@ -64,22 +65,36 @@ class Processor
 
     /**
      * @param callable $callback
+     * @param callable $errorCallback
      */
-    public function processWhile(Closure $callback)
+    public function processWhile(Closure $callback, Closure $errorCallback = null)
     {
+        if (!$errorCallback) {
+            $errorCallback = function () { };
+        }
+
         do {
-            $ret = $this->process();
+            $ret = $this->process($errorCallback);
         } while ($callback($ret));
     }
 
     /**
-     * Processes a single message from the queue
-     *
-     * @return boolean True if processed, false if queue is empty.
+     * @param callable $errorCallback
+     * @return bool
+     * @throws RuntimeException
      */
-    public function process()
+    public function process(Closure $errorCallback = null)
     {
-        $message = $this->queue->dequeue();
+        if (!$errorCallback) {
+            $errorCallback = function () { };
+        }
+
+        try {
+            $message = $this->queue->dequeue();
+        } catch (RuntimeException $e) {
+            $errorCallback($this, $e);
+            return false;
+        }
 
         if (!$message) {
             $this->eventDispatcher->dispatch(Events::QUEUE_EMPTY);
@@ -92,7 +107,7 @@ class Processor
         if (!$result) {
 
             $this->eventDispatcher->dispatch(Events::MESSAGE_NOT_HANDLABLE, new MessageEvent($message));
-            throw new \RuntimeException(sprintf("No handler will handle a message of type '%s'", $message->getType()));
+            throw new RuntimeException(sprintf("No handler will handle a message of type '%s'", $message->getType()));
         }
 
         if ($result->isSuccess()) {
