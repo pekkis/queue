@@ -21,7 +21,7 @@
         "ramsey/uuid": "~2.8",
         "videlalvaro/php-amqplib": "~2.5",
         "iron-io/iron_mq": "~2.0",
-        "aws/aws-sdk-php": "~2.8"
+        "aws/aws-sdk-php": "~3.2"
     },
 
     "require-dev": {

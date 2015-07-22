@@ -10,7 +10,6 @@
 namespace Pekkis\Queue\Adapter;
 
 use Aws\Sqs\SqsClient;
-use Guzzle\Service\Resource\Model;
 
 class AmazonSQSAdapter implements Adapter
 {
@@ -39,11 +38,14 @@ class AmazonSQSAdapter implements Adapter
         $this->queueName = $queueName;
         $this->visibilityTimeout = $visibilityTimeout;
 
-        $this->client = SqsClient::factory(
+        $this->client = new SqsClient(
             array(
-                'key'    => $key,
-                'secret' => $secret,
+                'credentials' => [
+                    'key'    => $key,
+                    'secret' => $secret,
+                ],
                 'region' => $region,
+                'version' => '2012-11-05',
             )
         );
 
@@ -52,7 +54,6 @@ class AmazonSQSAdapter implements Adapter
 
     public function dequeue()
     {
-        /** @var Model $result */
         $result = $this->client->receiveMessage(
             array(
                 'QueueUrl'        => $this->queueUrl,
