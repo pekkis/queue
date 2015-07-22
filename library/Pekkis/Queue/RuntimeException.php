@@ -11,5 +11,22 @@ namespace Pekkis\Queue;
 
 class RuntimeException extends \RuntimeException implements QueueException
 {
+    /**
+     * @var array
+     */
+    private $context = [];
 
+    /**
+     * @return array
+     */
+    public function getContext()
+    {
+        return $this->context;
+    }
+
+    public function setContext(array $context)
+    {
+        $this->context = $context;
+        return $this;
+    }
 }

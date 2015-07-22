@@ -103,7 +103,7 @@ class Queue implements QueueInterface
         $serializer = $this->dataSerializers->getUnserializerFor($serialized);
 
         if (!$serializer) {
-            throw new RuntimeException('Unserializer not found');
+            throw (new RuntimeException('Unserializer not found'))->setContext($raw);
         }
 
         $json['data'] = $serializer->unserialize($serialized->getData());

@@ -5,6 +5,7 @@ namespace Pekkis\Queue\Tests\Processor;
 use Pekkis\Queue\Processor\Result;
 use Pekkis\Queue\Processor\Processor;
 use Pekkis\Queue\Message;
+use Pekkis\Queue\Queue;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Pekkis\Queue\SymfonyBridge\EventDispatchingQueue;
 use Pekkis\Queue\RuntimeException;
@@ -188,15 +189,31 @@ class ProcessorTest extends \Pekkis\Queue\Tests\TestCase
         $ed = $this->prophesize(EventDispatcherInterface::class);
         $queue = $this->prophesize(EventDispatchingQueue::class);
 
+        $e = new RuntimeException('Xoo');
+        $e->setContext([
+            'tussenhofer',
+            'identificado',
+        ]);
+
         $queue->getEventDispatcher()->willReturn($ed->reveal());
 
-        $queue->dequeue()->shouldBeCalled()->willThrow(new RuntimeException('Xoo'));
+        $queue->dequeue()->shouldBeCalled()->willThrow($e);
 
         $processor = new Processor($queue->reveal());
 
         $this->assertEquals(0, $this->counter);
 
-        $processor->process(function () {
+        $processor->process(function (Processor $p, RuntimeException $e) use ($processor) {
+            $this->assertSame($processor, $p);
+
+            $this->assertEquals(
+                [
+                    'tussenhofer',
+                    'identificado',
+                ],
+                $e->getContext()
+            );
+
             $this->counter += 1;
         });
 

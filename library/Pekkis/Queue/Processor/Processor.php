@@ -92,7 +92,7 @@ class Processor
         try {
             $message = $this->queue->dequeue();
         } catch (RuntimeException $e) {
-            $errorCallback();
+            $errorCallback($this, $e);
             return false;
         }
 
