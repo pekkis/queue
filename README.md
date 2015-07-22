@@ -71,4 +71,4 @@ Supported queues
 Version upgrades
 -----------------
 
-Refer to CHANGELOG.md
+Refer to [the change log](CHANGELOG.md)
