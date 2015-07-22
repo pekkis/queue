@@ -9,6 +9,8 @@
 
 namespace Pekkis\Queue;
 
+use Pekkis\Queue\Adapter\Adapter;
+
 Interface QueueInterface
 {
     /**
@@ -36,4 +38,9 @@ Interface QueueInterface
      * @param Message $message
      */
     public function ack(Message $message);
+
+    /**
+     * @return Adapter
+     */
+    public function getAdapter();
 }

@@ -13,6 +13,7 @@ use Pekkis\Queue\QueueInterface;
 use Pekkis\Queue\Message;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Pekkis\Queue\Adapter\Adapter;
 
 class EventDispatchingQueue implements QueueInterface
 {
@@ -94,6 +95,14 @@ class EventDispatchingQueue implements QueueInterface
     {
         $this->eventDispatcher->addSubscriber($subscriber);
         return $this;
+    }
+
+    /**
+     * @return Adapter
+     */
+    public function getAdapter()
+    {
+        return $this->queue->getAdapter();
     }
 
 }

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.0.1
+
+- Fixed an oversight in queue interface and Symfony bridge.
+
 ## 1.0
 
 - Throws namespaced exceptions instead of generic RuntimeException ones.
