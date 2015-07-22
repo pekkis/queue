@@ -9,8 +9,8 @@
 
 namespace Pekkis\Queue\Adapter;
 
+use IronCore\HttpException;
 use IronMQ\IronMQ;
-use Pekkis\Queue\Message;
 
 /**
  * IronMQ queue
@@ -61,7 +61,7 @@ class IronMQAdapter implements Adapter
     }
 
     /**
-     * @param Message $msg
+     * @param string $message
      * @return bool
      */
     public function enqueue($message)
@@ -95,7 +95,7 @@ class IronMQAdapter implements Adapter
     {
         try {
             $this->queue->clearQueue($this->queueName);
-        } catch (\Http_Exception $e) {
+        } catch (HttpException $e) {
             // Queue is not found, so it's as good as purged, no?
             if ($e->getCode() !== 404) {
                 throw $e;

@@ -10,9 +10,9 @@
 namespace Pekkis\Queue\Adapter;
 
 use PhpAmqpLib\Connection\AMQPConnection;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Channel\AMQPChannel;
-use Pekkis\Queue\Message;
 
 class PhpAMQPAdapter implements Adapter
 {
@@ -53,7 +53,7 @@ class PhpAMQPAdapter implements Adapter
     private function getChannel()
     {
         if (!$this->channel) {
-            $conn = new AMQPConnection(
+            $conn = new AMQPStreamConnection(
                 $this->connectionOptions['host'],
                 $this->connectionOptions['port'],
                 $this->connectionOptions['user'],

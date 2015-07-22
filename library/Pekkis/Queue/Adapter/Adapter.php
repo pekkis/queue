@@ -9,8 +9,6 @@
 
 namespace Pekkis\Queue\Adapter;
 
-use Pekkis\Queue\Message;
-
 interface Adapter
 {
     /**

@@ -11,7 +11,6 @@ namespace Pekkis\Queue\Adapter;
 
 use Aws\Sqs\SqsClient;
 use Guzzle\Service\Resource\Model;
-use Pekkis\Queue\Message;
 
 class AmazonSQSAdapter implements Adapter
 {

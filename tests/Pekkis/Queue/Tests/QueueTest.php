@@ -161,4 +161,12 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
         );
         $this->assertSame($this->queue, $ret);
     }
+
+    /**
+     * @test
+     */
+    public function returnsAdapter()
+    {
+        $this->assertSame($this->adapter, $this->queue->getAdapter());
+    }
 }

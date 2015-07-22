@@ -17,6 +17,7 @@ use Pekkis\Queue\Data\SerializedData;
 use Pekkis\Queue\Filter\InputFilters;
 use Pekkis\Queue\Filter\OutputFilters;
 use Closure;
+use Pekkis\Queue\RuntimeException;
 
 class Queue implements QueueInterface
 {
@@ -60,13 +61,13 @@ class Queue implements QueueInterface
      * @param string $type
      * @param mixed $data
      * @return Message
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function enqueue($type, $data = null)
     {
         $serializer = $this->dataSerializers->getSerializerFor($data);
         if (!$serializer) {
-            throw new \RuntimeException("Serializer not found");
+            throw new RuntimeException("Serializer not found");
         }
         $serializedData = new SerializedData($serializer->getIdentifier(), $serializer->serialize($data));
 
@@ -102,7 +103,7 @@ class Queue implements QueueInterface
         $serializer = $this->dataSerializers->getUnserializerFor($serialized);
 
         if (!$serializer) {
-            throw new \RuntimeException('Unserializer not found');
+            throw new RuntimeException('Unserializer not found');
         }
 
         $json['data'] = $serializer->unserialize($serialized->getData());
@@ -155,5 +156,13 @@ class Queue implements QueueInterface
     {
         $this->inputFilters->add($callable);
         return $this;
+    }
+
+    /**
+     * @return Adapter
+     */
+    public function getAdapter()
+    {
+        return $this->adapter;
     }
 }

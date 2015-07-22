@@ -5,6 +5,9 @@ namespace Pekkis\Queue\Tests\Processor;
 use Pekkis\Queue\Processor\Result;
 use Pekkis\Queue\Processor\Processor;
 use Pekkis\Queue\Message;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Pekkis\Queue\SymfonyBridge\EventDispatchingQueue;
+use Pekkis\Queue\RuntimeException;
 
 class ProcessorTest extends \Pekkis\Queue\Tests\TestCase
 {
@@ -22,6 +25,8 @@ class ProcessorTest extends \Pekkis\Queue\Tests\TestCase
      * @var Processor
      */
     protected $processor;
+
+    protected $counter = 0;
 
 
     public function setUp()
@@ -58,7 +63,7 @@ class ProcessorTest extends \Pekkis\Queue\Tests\TestCase
 
         $this->queue->expects($this->once())->method('dequeue')->will($this->returnValue($message));
 
-        $this->processor->process($message);
+        $this->processor->process();
     }
 
     /**
@@ -84,7 +89,7 @@ class ProcessorTest extends \Pekkis\Queue\Tests\TestCase
 
         $this->processor->registerHandler($mockHandler);
 
-        $this->processor->process($message);
+        $this->processor->process();
     }
 
     public function provideData()
@@ -135,7 +140,7 @@ class ProcessorTest extends \Pekkis\Queue\Tests\TestCase
         $this->processor->registerHandler($mockHandler2);
         $this->processor->registerHandler($mockHandler);
 
-        $this->processor->process($message);
+        $this->processor->process();
     }
 
     /**
@@ -172,5 +177,29 @@ class ProcessorTest extends \Pekkis\Queue\Tests\TestCase
                 return true;
             }
         );
+    }
+
+    /**
+     * @test
+     * @group loso
+     */
+    public function handlesDequeueError()
+    {
+        $ed = $this->prophesize(EventDispatcherInterface::class);
+        $queue = $this->prophesize(EventDispatchingQueue::class);
+
+        $queue->getEventDispatcher()->willReturn($ed->reveal());
+
+        $queue->dequeue()->shouldBeCalled()->willThrow(new RuntimeException('Xoo'));
+
+        $processor = new Processor($queue->reveal());
+
+        $this->assertEquals(0, $this->counter);
+
+        $processor->process(function () {
+            $this->counter += 1;
+        });
+
+        $this->assertEquals(1, $this->counter);
     }
 }

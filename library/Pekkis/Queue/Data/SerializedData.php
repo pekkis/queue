@@ -9,6 +9,8 @@
 
 namespace Pekkis\Queue\Data;
 
+use Pekkis\Queue\RuntimeException;
+
 class SerializedData
 {
     /**
@@ -60,7 +62,7 @@ class SerializedData
         );
 
         if (false === $encoded) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 sprintf("Failed to JSON encode serialized data with '%s'", $this->data)
             );
         }
