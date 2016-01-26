@@ -1,6 +1,11 @@
 language: php
 sudo: false
 
+addons:
+  apt:
+    packages:
+    - librabbitmq-dev
+
 php:
   - 5.5
   - 5.6
@@ -23,7 +28,6 @@ services:
 before_script:
   - curl -s http://getcomposer.org/installer | php && php composer.phar install --dev
   - phpenv rehash
-  - sudo apt-get install -y librabbitmq-dev
   - wget https://pecl.php.net/get/amqp-1.6.1.tgz
   - tar -xzf amqp-1.6.1.tgz
   - sh -c "cd amqp-1.6.1 && phpize && ./configure && make && sudo make install"
