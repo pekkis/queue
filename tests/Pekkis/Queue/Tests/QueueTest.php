@@ -59,7 +59,7 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
         $this->adapter->
             expects($this->once())
             ->method('dequeue')
-            ->will($this->returnValue(array($input, 'aybabtu')));
+            ->will($this->returnValue(array($input, 'aybabtu', [])));
 
         $dequeued = $this->queue->dequeue();
         $this->assertInstanceof('Pekkis\Queue\Message', $dequeued);
@@ -131,7 +131,7 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
         $this->adapter->
             expects($this->once())
             ->method('dequeue')
-            ->will($this->returnValue(array($json, 'aybabtu')));
+            ->will($this->returnValue(array($json, 'aybabtu', [])));
 
         $this->queue->dequeue();
     }

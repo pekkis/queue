@@ -1,8 +1,14 @@
 language: php
+sudo: false
 
 php:
   - 5.5
   - 5.6
+  - 7.0
+
+matrix:
+  allow_failures:
+    - php: 7.0
 
 env:
   global:
@@ -18,9 +24,9 @@ before_script:
   - curl -s http://getcomposer.org/installer | php && php composer.phar install --dev
   - phpenv rehash
   - sudo apt-get install -y librabbitmq-dev
-  - wget https://pecl.php.net/get/amqp-1.6.0beta3.tgz
-  - tar -xzf amqp-1.6.0beta3.tgz
-  - sh -c "cd amqp-1.6.0beta3 && phpize && ./configure && make && sudo make install"
+  - wget https://pecl.php.net/get/amqp-1.6.1.tgz
+  - tar -xzf amqp-1.6.1.tgz
+  - sh -c "cd amqp-1.6.1 && phpize && ./configure && make && sudo make install"
   - echo "extension=amqp.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
 
 script: cd tests && ../vendor/bin/phpunit -v --configuration phpunit.xml.travis

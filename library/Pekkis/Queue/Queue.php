@@ -80,6 +80,8 @@ class Queue implements QueueInterface
 
         $json = json_encode($arr);
         $json = $this->outputFilters->filter($json);
+
+
         $this->adapter->enqueue($json);
         return $message;
     }
@@ -96,7 +98,7 @@ class Queue implements QueueInterface
             return false;
         }
 
-        list ($json, $identifier) = $raw;
+        list ($json, $identifier, $internals) = $raw;
         $json = $this->inputFilters->filter($json);
         $json = json_decode($json, true);
         $serialized = SerializedData::fromJson($json['data']);
@@ -109,6 +111,11 @@ class Queue implements QueueInterface
         $json['data'] = $serializer->unserialize($serialized->getData());
         $message = Message::fromArray($json);
         $message->setIdentifier($identifier);
+
+        foreach ($internals as $key => $value) {
+            $message->setInternal($key, $value);
+        }
+
         return $message;
     }
 
@@ -127,7 +134,7 @@ class Queue implements QueueInterface
      */
     public function ack(Message $message)
     {
-        return $this->adapter->ack($message->getIdentifier());
+        return $this->adapter->ack($message->getIdentifier(), $message->getInternals());
     }
 
     /**

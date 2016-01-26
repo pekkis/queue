@@ -34,6 +34,7 @@ interface Adapter
      * Acknowledges a message
      *
      * @param mixed $identifier
+     * @param array $internals
      */
-    public function ack($identifier);
+    public function ack($identifier, $internals);
 }

@@ -90,7 +90,8 @@ class PhpAMQPAdapter implements Adapter
 
         return array(
             $msg->body,
-            $msg->delivery_info['delivery_tag']
+            $msg->delivery_info['delivery_tag'],
+            []
         );
     }
 
@@ -99,7 +100,7 @@ class PhpAMQPAdapter implements Adapter
         return $this->getChannel()->queue_purge($this->queue);
     }
 
-    public function ack($identifier)
+    public function ack($identifier, $internals)
     {
         $this->getChannel()->basic_ack($identifier);
     }

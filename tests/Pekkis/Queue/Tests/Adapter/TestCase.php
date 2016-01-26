@@ -48,11 +48,10 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
 
         $this->adapter->enqueue($this->message);
 
-        list ($message, $identifier) = $this->adapter->dequeue();
+        list ($message, $identifier, $internals) = $this->adapter->dequeue();
         $this->assertEquals($this->message, $message);
 
-        $this->adapter->ack($identifier);
-
+        $this->adapter->ack($identifier, $internals);
         $this->assertFalse($this->adapter->dequeue());
     }
 
@@ -77,9 +76,10 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
             $this->adapter->enqueue("message {$x}");
         }
 
-        list ($msg, $identifier) = $this->adapter->dequeue();
+        list ($msg, $identifier, $internals) = $this->adapter->dequeue();
         $this->assertInternalType('string', $msg);
-        $this->adapter->ack($identifier);
+
+        $this->adapter->ack($identifier, $internals);
 
         $this->adapter->purge();
 
@@ -100,7 +100,7 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
         $message = 'messago mucho masculino';
         $queue->enqueue($message);
 
-        list ($dequeued, $identifier) = $queue->dequeue();
+        list ($dequeued, $identifier, $internals) = $queue->dequeue();
 
         $this->assertEquals($message, $dequeued);
         $this->assertFalse($queue->dequeue());
@@ -123,10 +123,10 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
 
         $queue = $this->getAdapter();
 
-        list ($dequeued, $identifier) = $queue->dequeue();
+        list ($dequeued, $identifier, $internals) = $queue->dequeue();
         $this->assertEquals($message, $dequeued);
 
-        $queue->ack($identifier);
+        $queue->ack($identifier, $internals);
     }
 
     /**

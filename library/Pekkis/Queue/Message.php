@@ -38,7 +38,7 @@ class Message
      * @param string $type
      * @param mixed $data
      */
-    private function __construct($uuid, $type, $data)
+    private function __construct($uuid, $type, $data, $identifier = null)
     {
         $this->uuid = $uuid;
         $this->type = $type;
@@ -99,6 +99,14 @@ class Message
             return $default;
         }
         return $this->internal[$key];
+    }
+
+    /**
+     * @return array
+     */
+    public function getInternals()
+    {
+        return $this->internal;
     }
 
     /**

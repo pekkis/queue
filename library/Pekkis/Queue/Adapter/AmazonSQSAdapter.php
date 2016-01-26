@@ -65,7 +65,11 @@ class AmazonSQSAdapter implements Adapter
             return false;
         }
 
-        return array($messages[0]['Body'], $messages[0]['ReceiptHandle']);
+        return array(
+            $messages[0]['Body'],
+            $messages[0]['ReceiptHandle'],
+            []
+        );
     }
 
     public function enqueue($message)
@@ -81,12 +85,12 @@ class AmazonSQSAdapter implements Adapter
     public function purge()
     {
         while ($dequeued = $this->dequeue()) {
-            list ($message, $identifier) = $dequeued;
-            $this->ack($identifier);
+            list ($message, $identifier, $internals) = $dequeued;
+            $this->ack($identifier, $internals);
         }
     }
 
-    public function ack($identifier)
+    public function ack($identifier, $internals)
     {
         $this->client->deleteMessage(
             array(

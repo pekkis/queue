@@ -76,7 +76,11 @@ class PeclAMQPAdapter implements Adapter
             return false;
         }
 
-        return array($msg->getBody(), $msg->getDeliveryTag());
+        return array(
+            $msg->getBody(),
+            $msg->getDeliveryTag(),
+            []
+        );
     }
 
     public function purge()
@@ -84,7 +88,7 @@ class PeclAMQPAdapter implements Adapter
         return $this->queue->purge();
     }
 
-    public function ack($identifier)
+    public function ack($identifier, $internals)
     {
         $this->queue->ack($identifier);
     }
