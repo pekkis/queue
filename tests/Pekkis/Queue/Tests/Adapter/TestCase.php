@@ -34,11 +34,6 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
         return 1;
     }
 
-    protected function createMessage($type, array $data)
-    {
-    }
-
-
     /**
      * @test
      */
@@ -46,13 +41,12 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
     {
         $this->adapter->purge();
 
-        $this->adapter->enqueue($this->message);
+        $this->adapter->enqueue($this->message, 'tenhusen-suuruuden-ylistys');
 
-        list ($message, $identifier) = $this->adapter->dequeue();
+        list ($message, $identifier, $internals) = $this->adapter->dequeue();
         $this->assertEquals($this->message, $message);
 
-        $this->adapter->ack($identifier);
-
+        $this->adapter->ack($identifier, $internals);
         $this->assertFalse($this->adapter->dequeue());
     }
 
@@ -74,12 +68,13 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
         $this->adapter->purge();
 
         for ($x = 10; $x <= 10; $x++) {
-            $this->adapter->enqueue("message {$x}");
+            $this->adapter->enqueue("message {$x}", 'tenhunen');
         }
 
-        list ($msg, $identifier) = $this->adapter->dequeue();
+        list ($msg, $identifier, $internals) = $this->adapter->dequeue();
         $this->assertInternalType('string', $msg);
-        $this->adapter->ack($identifier);
+
+        $this->adapter->ack($identifier, $internals);
 
         $this->adapter->purge();
 
@@ -98,9 +93,9 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
         $this->assertFalse($queue->dequeue());
 
         $message = 'messago mucho masculino';
-        $queue->enqueue($message);
+        $queue->enqueue($message, 'tenhunen');
 
-        list ($dequeued, $identifier) = $queue->dequeue();
+        list ($dequeued, $identifier, $internals) = $queue->dequeue();
 
         $this->assertEquals($message, $dequeued);
         $this->assertFalse($queue->dequeue());
@@ -123,10 +118,10 @@ abstract class TestCase extends \Pekkis\Queue\Tests\TestCase
 
         $queue = $this->getAdapter();
 
-        list ($dequeued, $identifier) = $queue->dequeue();
+        list ($dequeued, $identifier, $internals) = $queue->dequeue();
         $this->assertEquals($message, $dequeued);
 
-        $queue->ack($identifier);
+        $queue->ack($identifier, $internals);
     }
 
     /**

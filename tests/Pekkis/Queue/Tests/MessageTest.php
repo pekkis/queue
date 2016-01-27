@@ -12,13 +12,13 @@ class MessageTest extends \Pekkis\Queue\Tests\TestCase
      */
     public function initializesProperly()
     {
-        $type = 'test';
+        $topic = 'test';
         $data = array('message' => 'All your base are belong to us');
 
-        $message = Message::create($type, $data);
+        $message = Message::create($topic, $data);
 
         $this->assertEquals($data, $message->getData());
-        $this->assertEquals($type, $message->getType());
+        $this->assertEquals($topic, $message->getTopic());
         $this->assertUuid($message->getUuid());
 
     }
@@ -30,7 +30,7 @@ class MessageTest extends \Pekkis\Queue\Tests\TestCase
     {
         $arr = array(
             'uuid' => 'lussutus-uuid',
-            'type' => 'lussutusviesti',
+            'topic' => 'lussutusviesti',
             'data' => array('lussutappa' => 'tussia')
         );
 
@@ -38,7 +38,7 @@ class MessageTest extends \Pekkis\Queue\Tests\TestCase
 
         $this->assertEquals($arr['data'], $message->getData());
         $this->assertEquals($arr['uuid'], $message->getUuid());
-        $this->assertEquals($arr['type'], $message->getType());
+        $this->assertEquals($arr['topic'], $message->getTopic());
     }
 
     /**

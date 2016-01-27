@@ -107,7 +107,7 @@ class Processor
         if (!$result) {
 
             $this->eventDispatcher->dispatch(Events::MESSAGE_NOT_HANDLABLE, new MessageEvent($message));
-            throw new RuntimeException(sprintf("No handler will handle a message of type '%s'", $message->getType()));
+            throw new RuntimeException(sprintf("No handler will handle a message of topic '%s'", $message->getTopic()));
         }
 
         if ($result->isSuccess()) {

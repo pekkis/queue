@@ -58,12 +58,12 @@ class Queue implements QueueInterface
     }
 
     /**
-     * @param string $type
+     * @param string $topic
      * @param mixed $data
      * @return Message
      * @throws RuntimeException
      */
-    public function enqueue($type, $data = null)
+    public function enqueue($topic, $data = null)
     {
         $serializer = $this->dataSerializers->getSerializerFor($data);
         if (!$serializer) {
@@ -71,16 +71,17 @@ class Queue implements QueueInterface
         }
         $serializedData = new SerializedData($serializer->getIdentifier(), $serializer->serialize($data));
 
-        $message = Message::create($type, $data);
+        $message = Message::create($topic, $data);
         $arr = array(
             'uuid' => $message->getUuid(),
-            'type' => $message->getType(),
+            'topic' => $message->getTopic(),
             'data' => $serializedData->toJson()
         );
 
         $json = json_encode($arr);
         $json = $this->outputFilters->filter($json);
-        $this->adapter->enqueue($json);
+
+        $this->adapter->enqueue($json, $topic);
         return $message;
     }
 
@@ -96,7 +97,7 @@ class Queue implements QueueInterface
             return false;
         }
 
-        list ($json, $identifier) = $raw;
+        list ($json, $identifier, $internals) = $raw;
         $json = $this->inputFilters->filter($json);
         $json = json_decode($json, true);
         $serialized = SerializedData::fromJson($json['data']);
@@ -109,6 +110,11 @@ class Queue implements QueueInterface
         $json['data'] = $serializer->unserialize($serialized->getData());
         $message = Message::fromArray($json);
         $message->setIdentifier($identifier);
+
+        foreach ($internals as $key => $value) {
+            $message->setInternal($key, $value);
+        }
+
         return $message;
     }
 
@@ -127,7 +133,7 @@ class Queue implements QueueInterface
      */
     public function ack(Message $message)
     {
-        return $this->adapter->ack($message->getIdentifier());
+        return $this->adapter->ack($message->getIdentifier(), $message->getInternals());
     }
 
     /**

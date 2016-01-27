@@ -34,13 +34,13 @@ class EventDispatchingQueue implements QueueInterface
     }
 
     /**
-     * @param string $type
+     * @param string $topic
      * @param null $data
      * @return Message
      */
-    public function enqueue($type, $data = null)
+    public function enqueue($topic, $data = null)
     {
-        $message = $this->queue->enqueue($type, $data);
+        $message = $this->queue->enqueue($topic, $data);
         $this->eventDispatcher->dispatch(Events::ENQUEUE, new MessageEvent($message));
 
         return $message;

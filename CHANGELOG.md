@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2.0.0
+
+- "type" was renamed to "topic" in all things related.
+- Upgraded IronMQ libraries. 3.x queues are REQUIRED.
+- Upgraded Symfony deps to support 3.x series.
+- Added options (exchange type, routing key) to AMQP adapters.
+
 ## 1.0.1
 
 - Fixed an oversight in queue interface and Symfony bridge.

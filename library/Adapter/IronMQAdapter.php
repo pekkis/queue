@@ -11,6 +11,7 @@ namespace Pekkis\Queue\Adapter;
 
 use IronCore\HttpException;
 use IronMQ\IronMQ;
+use Pekkis\Queue\RuntimeException;
 
 /**
  * IronMQ queue
@@ -47,6 +48,10 @@ class IronMQAdapter implements Adapter
      */
     public function __construct($token, $projectId, $queueName, $timeout = 60, $expiresIn = 604800, $host = null)
     {
+        if ($timeout < 30) {
+            throw new RuntimeException('IronMQ v3 has a minimum timeout of 30');
+        }
+
         $this->queue = new IronMQ(
             array(
                 'token' => $token,
@@ -64,7 +69,7 @@ class IronMQAdapter implements Adapter
      * @param string $message
      * @return bool
      */
-    public function enqueue($message)
+    public function enqueue($message, $topic)
     {
         try {
             $this->queue->postMessage(
@@ -83,12 +88,18 @@ class IronMQAdapter implements Adapter
 
     public function dequeue()
     {
-        $rawMsg = $this->queue->getMessage($this->queueName, $this->timeout);
+        $rawMsg = $this->queue->reserveMessage($this->queueName, $this->timeout);
         if (!$rawMsg) {
             return false;
         }
 
-        return array($rawMsg->body, $rawMsg->id);
+        return array(
+            $rawMsg->body,
+            $rawMsg->id,
+            [
+                'reservation_id' => $rawMsg->reservation_id
+            ]
+        );
     }
 
     public function purge()
@@ -104,8 +115,8 @@ class IronMQAdapter implements Adapter
         }
     }
 
-    public function ack($identifier)
+    public function ack($identifier, $internals)
     {
-        $this->queue->deleteMessage($this->queueName, $identifier);
+        $this->queue->deleteMessage($this->queueName, $identifier, $internals['reservation_id']);
     }
 }

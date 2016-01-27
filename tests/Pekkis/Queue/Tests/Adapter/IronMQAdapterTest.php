@@ -21,7 +21,7 @@ class IronMQAdapterTest extends TestCase
             getenv('IRONMQ_TOKEN'),
             getenv('IRONMQ_PROJECT_ID'),
             'pekkis-queue-test',
-            3,
+            30,
             604800,
             getenv('IRONMQ_HOST') ?: null
         );
@@ -29,6 +29,6 @@ class IronMQAdapterTest extends TestCase
 
     protected function getSleepyTime()
     {
-        return 6;
+        return 40;
     }
 }

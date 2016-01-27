@@ -13,7 +13,6 @@ use AMQPConnection;
 use AMQPChannel;
 use AMQPExchange;
 use AMQPQueue;
-use Pekkis\Queue\Message;
 
 class PeclAMQPAdapter implements Adapter
 {
@@ -29,8 +28,22 @@ class PeclAMQPAdapter implements Adapter
 
     private $queue;
 
-    public function __construct($host, $port, $login, $password, $vhost, $exchangeName, $queueName)
-    {
+    private $routingKey;
+
+    public function __construct(
+        $host,
+        $port,
+        $login,
+        $password,
+        $vhost,
+        $exchangeName,
+        $queueName,
+        $exchangeType = AMQP_EX_TYPE_DIRECT,
+        $routingKey = ''
+    ) {
+
+        $this->routingKey = $routingKey;
+
         $conn = new AMQPConnection(
             array(
                 'host' => $host,
@@ -47,26 +60,32 @@ class PeclAMQPAdapter implements Adapter
 
         $exchange = new AMQPExchange($channel);
         $exchange->setName($exchangeName);
-        $exchange->setType(AMQP_EX_TYPE_DIRECT);
+        $exchange->setType($exchangeType);
         $exchange->setFlags(AMQP_DURABLE);
+
         $exchange->declareExchange();
 
         $queue = new AMQPQueue($channel);
         $queue->setName($queueName);
         $queue->setFlags(AMQP_DURABLE);
+        $queue->bind($exchangeName, $routingKey);
         $queue->declareQueue();
-        $queue->bind($exchangeName, '');
 
         $this->conn = $conn;
         $this->exchange = $exchange;
         $this->channel = $channel;
         $this->queue = $queue;
-
     }
 
-    public function enqueue($msg)
+    public function enqueue($msg, $topic)
     {
-        $this->exchange->publish($msg, '');
+        if ($this->routingKey) {
+            $routingKey = $topic;
+        } else {
+            $routingKey = '';
+        }
+
+        $this->exchange->publish($msg, $routingKey);
     }
 
     public function dequeue()
@@ -76,7 +95,11 @@ class PeclAMQPAdapter implements Adapter
             return false;
         }
 
-        return array($msg->getBody(), $msg->getDeliveryTag());
+        return array(
+            $msg->getBody(),
+            $msg->getDeliveryTag(),
+            []
+        );
     }
 
     public function purge()
@@ -84,7 +107,7 @@ class PeclAMQPAdapter implements Adapter
         return $this->queue->purge();
     }
 
-    public function ack($identifier)
+    public function ack($identifier, $internals)
     {
         $this->queue->ack($identifier);
     }

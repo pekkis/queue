@@ -16,7 +16,7 @@ class Message
     /**
      * @var string
      */
-    private $type;
+    private $topic;
 
     /**
      * @var string
@@ -35,13 +35,13 @@ class Message
 
     /**
      * @param string $uuid
-     * @param string $type
+     * @param string $topic
      * @param mixed $data
      */
-    private function __construct($uuid, $type, $data)
+    private function __construct($uuid, $topic, $data, $identifier = null)
     {
         $this->uuid = $uuid;
-        $this->type = $type;
+        $this->topic = $topic;
         $this->data = $data;
     }
 
@@ -64,9 +64,9 @@ class Message
     /**
      * @return string
      */
-    public function getType()
+    public function getTopic()
     {
-        return $this->type;
+        return $this->topic;
     }
 
     /**
@@ -102,6 +102,14 @@ class Message
     }
 
     /**
+     * @return array
+     */
+    public function getInternals()
+    {
+        return $this->internal;
+    }
+
+    /**
      * @return string
      */
     public function getIdentifier()
@@ -120,13 +128,13 @@ class Message
     }
 
     /**
-     * @param string $type
+     * @param string $topic
      * @param mixed $data
      * @return Message
      */
-    public static function create($type, $data = null)
+    public static function create($topic, $data = null)
     {
-        return new self(Uuid::uuid4()->toString(), $type, $data);
+        return new self(Uuid::uuid4()->toString(), $topic, $data);
     }
 
     /**
@@ -135,6 +143,6 @@ class Message
      */
     public static function fromArray(array $arr)
     {
-        return new self($arr['uuid'], $arr['type'], $arr['data']);
+        return new self($arr['uuid'], $arr['topic'], $arr['data']);
     }
 }

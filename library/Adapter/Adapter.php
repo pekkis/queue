@@ -15,8 +15,9 @@ interface Adapter
      * Enqueues a message
      *
      * @param string $message
+     * @param string $topic
      */
-    public function enqueue($message);
+    public function enqueue($message, $topic);
 
     /**
      * Dequeues a message
@@ -34,6 +35,7 @@ interface Adapter
      * Acknowledges a message
      *
      * @param mixed $identifier
+     * @param array $internals
      */
-    public function ack($identifier);
+    public function ack($identifier, $internals);
 }
