@@ -58,7 +58,7 @@ class ProcessorTest extends \Pekkis\Queue\Tests\TestCase
      */
     public function exceptionIsThrownWhenNoHandlers()
     {
-        $this->setExpectedException('RuntimeException', "No handler will handle a message of type 'test'");
+        $this->setExpectedException('RuntimeException', "No handler will handle a message of topic 'test'");
 
         $message = Message::create('test', array('banana' => 'is not just a banaana, banaana'));
 
@@ -73,7 +73,7 @@ class ProcessorTest extends \Pekkis\Queue\Tests\TestCase
      */
     public function exceptionIsThrownWhenNoHandlerWillHandleMessage()
     {
-        $this->setExpectedException('RuntimeException', "No handler will handle a message of type 'test'");
+        $this->setExpectedException('RuntimeException', "No handler will handle a message of topic 'test'");
 
         $message = Message::create('test', array('banana' => 'is not just a banaana, banaana'));
 

@@ -72,7 +72,7 @@ class AmazonSQSAdapter implements Adapter
         );
     }
 
-    public function enqueue($message)
+    public function enqueue($message, $topic)
     {
         $this->client->sendMessage(
             array(

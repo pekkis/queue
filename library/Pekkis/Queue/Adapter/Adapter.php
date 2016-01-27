@@ -15,8 +15,9 @@ interface Adapter
      * Enqueues a message
      *
      * @param string $message
+     * @param string $topic
      */
-    public function enqueue($message);
+    public function enqueue($message, $topic);
 
     /**
      * Dequeues a message

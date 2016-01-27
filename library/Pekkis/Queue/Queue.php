@@ -58,12 +58,12 @@ class Queue implements QueueInterface
     }
 
     /**
-     * @param string $type
+     * @param string $topic
      * @param mixed $data
      * @return Message
      * @throws RuntimeException
      */
-    public function enqueue($type, $data = null)
+    public function enqueue($topic, $data = null)
     {
         $serializer = $this->dataSerializers->getSerializerFor($data);
         if (!$serializer) {
@@ -71,18 +71,17 @@ class Queue implements QueueInterface
         }
         $serializedData = new SerializedData($serializer->getIdentifier(), $serializer->serialize($data));
 
-        $message = Message::create($type, $data);
+        $message = Message::create($topic, $data);
         $arr = array(
             'uuid' => $message->getUuid(),
-            'type' => $message->getType(),
+            'topic' => $message->getTopic(),
             'data' => $serializedData->toJson()
         );
 
         $json = json_encode($arr);
         $json = $this->outputFilters->filter($json);
 
-
-        $this->adapter->enqueue($json);
+        $this->adapter->enqueue($json, $topic);
         return $message;
     }
 

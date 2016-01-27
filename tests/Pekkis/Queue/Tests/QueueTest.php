@@ -51,7 +51,7 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
         $serialized = new SerializedData('Pekkis\Queue\Data\BasicDataSerializer', serialize('lussentus'));
         $arr = array(
             'uuid' => 'uuid',
-            'type' => 'lus.tus',
+            'topic' => 'lus.tus',
             'data' => $serialized->toJson()
         );
         $input = json_encode($arr);
@@ -65,7 +65,7 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
         $this->assertInstanceof('Pekkis\Queue\Message', $dequeued);
 
         $this->assertEquals('aybabtu', $dequeued->getIdentifier());
-        $this->assertEquals('lus.tus', $dequeued->getType());
+        $this->assertEquals('lus.tus', $dequeued->getTopic());
         $this->assertEquals('lussentus', $dequeued->getData());
     }
 
@@ -123,7 +123,7 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
 
         $arr = array(
             'uuid' => 'uuid',
-            'type' => 'lus.tus',
+            'topic' => 'lus.tus',
             'data' => $serialized->toJson()
         );
         $json = json_encode($arr);

@@ -69,7 +69,7 @@ class IronMQAdapter implements Adapter
      * @param string $message
      * @return bool
      */
-    public function enqueue($message)
+    public function enqueue($message, $topic)
     {
         try {
             $this->queue->postMessage(

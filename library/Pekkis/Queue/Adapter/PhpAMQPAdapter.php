@@ -9,7 +9,6 @@
 
 namespace Pekkis\Queue\Adapter;
 
-use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Channel\AMQPChannel;
@@ -26,15 +25,30 @@ class PhpAMQPAdapter implements Adapter
 
     private $queue;
 
+    private $exchangeType;
+
+    private $routingKey;
+
     /**
      * @var array
      */
     private $connectionOptions = array();
 
-    public function __construct($host, $port, $user, $pass, $vhost, $exchange, $queue)
-    {
+    public function __construct(
+        $host,
+        $port,
+        $user,
+        $pass,
+        $vhost,
+        $exchange,
+        $queue,
+        $exchangeType = 'direct',
+        $routingKey = ''
+    ) {
         $this->exchange = $exchange;
+        $this->exchangeType = $exchangeType;
         $this->queue = $queue;
+        $this->routingKey = $routingKey;
 
         $this->connectionOptions = array(
             'host' => $host,
@@ -62,22 +76,30 @@ class PhpAMQPAdapter implements Adapter
             );
             $ch = $conn->channel();
 
+            $ch->exchange_declare($this->exchange, $this->exchangeType, false, true, false);
+
             $ch->queue_declare($this->queue, false, true, false, false);
-            $ch->exchange_declare($this->exchange, 'direct', false, true, false);
-            $ch->queue_bind($this->queue, $this->exchange, '');
+
+            $ch->queue_bind($this->queue, $this->exchange, $this->routingKey);
             $this->channel = $ch;
         }
 
         return $this->channel;
     }
 
-    public function enqueue($msg)
+    public function enqueue($msg, $topic)
     {
+        if (!$this->routingKey) {
+            $routingKey = '';
+        } else {
+            $routingKey = $topic;
+        }
+
         $msg = new AMQPMessage(
             $msg,
             array('content_type' => 'text/plain', 'delivery-mode' => 1)
         );
-        $this->getChannel()->basic_publish($msg, $this->exchange, '', false, false);
+        $this->getChannel()->basic_publish($msg, $this->exchange, $routingKey, false, false);
     }
 
     public function dequeue()

@@ -51,16 +51,16 @@ class QueueIntegrationTest extends TestCase
      * @dataProvider provideMessages
      * @test
      */
-    public function messagesGoThroughThePipeUnchanged($type, $data)
+    public function messagesGoThroughThePipeUnchanged($topic, $data)
     {
         $this->assertFalse($this->queue->dequeue());
-        $message = $this->queue->enqueue($type, $data);
+        $message = $this->queue->enqueue($topic, $data);
 
         $dequeued = $this->queue->dequeue();
 
         $this->assertInstanceOf('Pekkis\Queue\Message', $dequeued);
 
-        $this->assertEquals($message->getType(), $dequeued->getType());
+        $this->assertEquals($message->getTopic(), $dequeued->getTopic());
         $this->assertEquals($message->getData(), $dequeued->getData());
 
         $this->queue->ack($dequeued);

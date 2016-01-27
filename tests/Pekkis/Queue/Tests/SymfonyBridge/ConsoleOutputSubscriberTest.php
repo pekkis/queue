@@ -66,7 +66,7 @@ class ConsoleOutputSubscriberTest extends \Pekkis\Queue\Tests\TestCase
                     function ($output) use ($self, $message, $expectedToContain) {
 
                         $self->assertContains($message->getUuid(), $output);
-                        $self->assertContains($message->getType(), $output);
+                        $self->assertContains($message->getTopic(), $output);
                         $self->assertContains($expectedToContain, $output);
 
                     }

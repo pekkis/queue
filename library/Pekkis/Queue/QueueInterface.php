@@ -14,11 +14,11 @@ use Pekkis\Queue\Adapter\Adapter;
 Interface QueueInterface
 {
     /**
-     * @param string $type
+     * @param string $topic
      * @param mixed $data
      * @return Message
      */
-    public function enqueue($type, $data = null);
+    public function enqueue($topic, $data = null);
 
     /**
      * Dequeues message
