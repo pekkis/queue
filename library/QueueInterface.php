@@ -17,6 +17,7 @@ Interface QueueInterface
      * @param string $topic
      * @param mixed $data
      * @return Message
+     * @throws RuntimeException
      */
     public function enqueue($topic, $data = null);
 

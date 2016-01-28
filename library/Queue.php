@@ -17,7 +17,6 @@ use Pekkis\Queue\Data\SerializedData;
 use Pekkis\Queue\Filter\InputFilters;
 use Pekkis\Queue\Filter\OutputFilters;
 use Closure;
-use Pekkis\Queue\RuntimeException;
 
 class Queue implements QueueInterface
 {
@@ -81,8 +80,12 @@ class Queue implements QueueInterface
         $json = json_encode($arr);
         $json = $this->outputFilters->filter($json);
 
-        $this->adapter->enqueue($json, $topic);
-        return $message;
+        try {
+            $this->adapter->enqueue($json, $topic);
+            return $message;
+        } catch (\Exception $e) {
+            throw new RuntimeException('Queuing a message failed', 0, $e);
+        }
     }
 
     /**

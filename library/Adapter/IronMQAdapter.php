@@ -71,19 +71,14 @@ class IronMQAdapter implements Adapter
      */
     public function enqueue($message, $topic)
     {
-        try {
-            $this->queue->postMessage(
-                $this->queueName,
-                $message,
-                array(
-                    'timeout' => $this->timeout,
-                    'expires_in' => $this->expiresIn
-                )
-            );
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
+        $this->queue->postMessage(
+            $this->queueName,
+            $message,
+            array(
+                'timeout' => $this->timeout,
+                'expires_in' => $this->expiresIn
+            )
+        );
     }
 
     public function dequeue()

@@ -5,6 +5,9 @@ namespace Pekkis\Queue\Tests;
 use Pekkis\Queue\Data\SerializedData;
 use Pekkis\Queue\Queue;
 use Pekkis\Queue\Message;
+use Pekkis\Queue\Adapter\Adapter;
+use Prophecy\Argument;
+use Pekkis\Queue\RuntimeException;
 
 class QueueTest extends \Pekkis\Queue\Tests\TestCase
 {
@@ -168,5 +171,29 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
     public function returnsAdapter()
     {
         $this->assertSame($this->adapter, $this->queue->getAdapter());
+    }
+
+    /**
+     * @test
+     * @group lussi
+     */
+    public function enqueueThrowsIfAdapterThrows()
+    {
+        $adapter = $this->prophesize(Adapter::class);
+
+        $adapter
+            ->enqueue(
+                Argument::type('string'),
+                Argument::type('string')
+            )
+            ->shouldBeCalled()
+            ->willThrow(
+                new \RuntimeException('bibbidi bobbidi buu')
+            );
+
+        $queue = new Queue($adapter->reveal());
+
+        $this->setExpectedException(RuntimeException::class);
+        $queue->enqueue('imaiseppa', 'mehewae');
     }
 }
