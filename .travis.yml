@@ -23,6 +23,5 @@ services:
 before_script:
   - curl -s http://getcomposer.org/installer | php && php composer.phar install --dev
   - phpenv rehash
-  - pecl install amqp
-
+  - pecl install amqp<<<''
 script: cd tests && ../vendor/bin/phpunit -v --configuration phpunit.xml.travis
