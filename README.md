@@ -13,6 +13,14 @@ A message consists of a topic and arbitrary data (basic serializable data suppor
 can be added). Messages are moved and grooved through a queue. The library extracts a simple, 80/20 like domain
 for it's method of operation and abstracts away the differences in message queue backends.
 
+Status
+-------
+
+The project is purely in maintenance mode. I have "moved on" since,
+code mostly JS & React these days.
+ 
+If you want to maintain this, holler!
+
 Quickstart
 -----------
 

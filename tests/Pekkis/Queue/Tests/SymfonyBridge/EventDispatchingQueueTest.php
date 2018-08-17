@@ -20,8 +20,8 @@ class EventDispatchingQueueTest extends TestCase
 
     public function setUp()
     {
-        $this->innerqueue = $this->getMock('Pekkis\Queue\QueueInterface');
-        $this->ed = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->innerqueue = $this->createMock('Pekkis\Queue\QueueInterface');
+        $this->ed = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->queue = new EventDispatchingQueue($this->innerqueue, $this->ed);
     }
 
@@ -123,7 +123,7 @@ class EventDispatchingQueueTest extends TestCase
      */
     public function addSubscriberDelegatesToEventDispatcher()
     {
-        $subscriber = $this->getMock('Symfony\Component\EventDispatcher\EventSubscriberInterface');
+        $subscriber = $this->createMock('Symfony\Component\EventDispatcher\EventSubscriberInterface');
         $this->ed->expects($this->once())->method('addSubscriber')->with($subscriber);
 
         $ret = $this->queue->addSubscriber($subscriber);

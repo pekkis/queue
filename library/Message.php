@@ -9,7 +9,7 @@
 
 namespace Pekkis\Queue;
 
-use Rhumsaa\Uuid\Uuid;
+use Ramsey\Uuid\Uuid;
 
 class Message
 {

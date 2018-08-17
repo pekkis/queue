@@ -21,7 +21,7 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
 
     public function setUp()
     {
-        $this->adapter = $this->getMock('Pekkis\Queue\Adapter\Adapter');
+        $this->adapter = $this->createMock('Pekkis\Queue\Adapter\Adapter');
         $this->queue = new Queue($this->adapter);
     }
 
@@ -111,7 +111,7 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
      */
     public function unknownDataThrowsExceptionWhenSerializing()
     {
-        $this->setExpectedException('RuntimeException', 'Serializer not found');
+        $this->expectException(RuntimeException::class);
         $this->queue->enqueue('lus.tus', new RandomBusinessObject());
     }
 
@@ -120,7 +120,7 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
      */
     public function unknownDataThrowsExceptionWhenUnserializing()
     {
-        $this->setExpectedException('RuntimeException', 'Unserializer not found');
+        $this->expectException(RuntimeException::class);
 
         $serialized = new SerializedData('SomeRandomSerializer', 'xooxoo');
 
@@ -193,7 +193,7 @@ class QueueTest extends \Pekkis\Queue\Tests\TestCase
 
         $queue = new Queue($adapter->reveal());
 
-        $this->setExpectedException(RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $queue->enqueue('imaiseppa', 'mehewae');
     }
 }

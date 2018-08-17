@@ -2,7 +2,10 @@
 
 namespace Pekkis\Queue\Data;
 
-class SerializedDataTest extends \PHPUnit_Framework_TestCase
+use Pekkis\Queue\RuntimeException;
+use PHPUnit\Framework\TestCase;
+
+class SerializedDataTest extends TestCase
 {
     /**
      * @test
@@ -10,7 +13,7 @@ class SerializedDataTest extends \PHPUnit_Framework_TestCase
      */
     public function failsWhenDataCannotBeEncoded()
     {
-        $this->setExpectedException('\RuntimeException');
+        $this->expectException(RuntimeException::class);
         $serializedData = new SerializedData('tussenhofer', utf8_decode('söösöö'));
         $serializedData->toJson();
     }

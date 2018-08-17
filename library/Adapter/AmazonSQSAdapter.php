@@ -61,6 +61,7 @@ class AmazonSQSAdapter implements Adapter
         );
 
         $messages = $result->get('Messages');
+
         if (!$messages) {
             return false;
         }
@@ -84,10 +85,11 @@ class AmazonSQSAdapter implements Adapter
 
     public function purge()
     {
-        while ($dequeued = $this->dequeue()) {
-            list ($message, $identifier, $internals) = $dequeued;
-            $this->ack($identifier, $internals);
-        }
+        $this->client->purgeQueue(array(
+            'QueueUrl' => $this->queueUrl,
+        ));
+
+        return true;
     }
 
     public function ack($identifier, $internals)

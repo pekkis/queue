@@ -33,7 +33,7 @@ class ConsoleOutputSubscriberTest extends \Pekkis\Queue\Tests\TestCase
 
         $this->ed = new EventDispatcher();
 
-        $this->output = $this->getMock('Symfony\Component\Console\Output\ConsoleOutputInterface');
+        $this->output = $this->createMock('Symfony\Component\Console\Output\ConsoleOutputInterface');
         $subscriber = new ConsoleOutputSubscriber($this->output);
         $this->ed->addSubscriber($subscriber);
 

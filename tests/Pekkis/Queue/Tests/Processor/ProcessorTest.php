@@ -32,7 +32,7 @@ class ProcessorTest extends \Pekkis\Queue\Tests\TestCase
 
     public function setUp()
     {
-        $this->ed = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->ed = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $queue = $this
             ->getMockBuilder('Pekkis\Queue\SymfonyBridge\EventDispatchingQueue')
@@ -58,7 +58,7 @@ class ProcessorTest extends \Pekkis\Queue\Tests\TestCase
      */
     public function exceptionIsThrownWhenNoHandlers()
     {
-        $this->setExpectedException('RuntimeException', "No handler will handle a message of topic 'test'");
+        $this->expectException(RuntimeException::class);
 
         $message = Message::create('test', array('banana' => 'is not just a banaana, banaana'));
 
@@ -73,13 +73,13 @@ class ProcessorTest extends \Pekkis\Queue\Tests\TestCase
      */
     public function exceptionIsThrownWhenNoHandlerWillHandleMessage()
     {
-        $this->setExpectedException('RuntimeException', "No handler will handle a message of topic 'test'");
+        $this->expectException(RuntimeException::class);
 
         $message = Message::create('test', array('banana' => 'is not just a banaana, banaana'));
 
         $this->queue->expects($this->once())->method('dequeue')->will($this->returnValue($message));
 
-        $mockHandler = $this->getMock('Pekkis\Queue\Processor\MessageHandler');
+        $mockHandler = $this->createMock('Pekkis\Queue\Processor\MessageHandler');
         $mockHandler
             ->expects($this->once())
             ->method('willHandle')
@@ -111,10 +111,10 @@ class ProcessorTest extends \Pekkis\Queue\Tests\TestCase
 
         $this->queue->expects($this->once())->method('dequeue')->will($this->returnValue($message));
 
-        $mockHandler2 = $this->getMock('Pekkis\Queue\Processor\MessageHandler');
+        $mockHandler2 = $this->createMock('Pekkis\Queue\Processor\MessageHandler');
         $mockHandler2->expects($this->never())->method('willHandle');
 
-        $mockHandler = $this->getMock('Pekkis\Queue\Processor\MessageHandler');
+        $mockHandler = $this->createMock('Pekkis\Queue\Processor\MessageHandler');
         $mockHandler
             ->expects($this->once())
             ->method('willHandle')
